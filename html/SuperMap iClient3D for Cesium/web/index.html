@@ -1,0 +1,736 @@
+<!--********************************************************************
+* Copyright© 2000 - 2020 SuperMap Software Co.Ltd. All rights reserved.
+*********************************************************************-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>SuperMap iClient3D for WebGL</title>
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no"/>
+    <meta name="keywords" content="SuperMap，超图，iClient,iClient 9D,iClient 10i,SuperMap iClient,
+    iClient JavaScript,iClient for WebGL"/>
+    <meta name="description" content="三维“零客户端”开发平台。"/>
+    <script type="text/javascript" exclude="common" include="swiper" src="./js/include.js"></script>
+    <link rel="stylesheet" href="./css/common.css"/>
+    <link rel="stylesheet" href="./css/index.css"/>
+    <link rel="stylesheet" href="./css/header.css"/>
+    <style type="text/css">
+<!--
+.STYLE14 {font-family: "微软雅黑"}
+.STYLE15 {font-size: medium}
+-->
+    </style>
+</head>
+
+<body class="hold-transition skin-blue sidebar-mini theme-bg">
+<!--导航+巨幕区域-->
+<header class="header-home">
+    <div class="bgc-image">
+    </div>
+    <!--顶部导航-->
+    <header class="header-wrapper main-header icl-header"></header>
+    <script>
+        var navigation = {
+            nav: {
+                title: 'SuperMap iClient3D for WebGL',
+                path: '../web/',
+                isLocal: window.isLocal
+            }
+        };
+        identification = {};
+        utils.loadTemplate('.icl-header', './template/header.html', navigation);
+
+    </script>
+    <!--顶部导航 end-->
+
+    <!--巨幕区域-->
+    <div class="screen container">
+        <div class="row">发、
+            <!-- 右边的文字 -->放
+            <div class="col-md-6 col-sm-12 header-description animated fadeIn">
+                <div class="col-md-11 col-sm-11" id="header2-text">
+                    <h3 class="tc pt50">三维“零客户端”开发平台</h3>
+                    <p style="color:rgba(255, 255, 255, 0.6);margin-top: 16px;font-size: 24px;">免费、开放、可扩展</p>
+
+                </div>
+                <!-- 左边的链接按钮 -->
+                <div class="buttons" style="padding-left:0px">
+                    <div class="buttonsdiv">
+                        <div class="button-zip" id="button_zip">
+                            <!--<a style="height:36px;" class="radiusBtn download" href="download/download.html">-->
+                            <a style="height:36px;" class="radiusBtn download" href="./downloads/download1.html">
+                                <div style="line-height:36px;">
+                                    <span>下  载</span>
+                                    <img src="./img/svg/download.svg" class="radiusBtnimg"/>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="button-examples" id="button_examples">
+                            <a class="radiusBtn code" target="_blank"
+                               href="../examples/webgl/examples.html">
+                                <div>
+                                    <span>示  例</span>
+                                    <svg class="icon" viewBox="0 0 18 18"
+                                         style="height: 15px;width: 13px; margin-left: 8px; margin-bottom: -3px;">
+                                        <g transform="translate(-1195.000000, -898.000000)">
+                                            <g transform="translate(1192.000000, 895.000000)">
+                                                <path d="M10.9,3.4H3.8c-0.2,0-0.4,0.2-0.4,0.4v7.1c0,0.2,0.2,0.4,0.4,0.4h7.1c0.2,0,0.4-0.2,0.4-0.4V3.8
+                                                         C11.2,3.5,11.1,3.4,10.9,3.4z M9.7,9.7H5V5h4.7V9.7z M20.2,3.4h-7.1c-0.2,0-0.4,0.2-0.4,0.4v7.1c0,0.2,0.2,0.4,0.4,0.4h7.1
+                                                         c0.2,0,0.4-0.2,0.4-0.4V3.8C20.6,3.5,20.5,3.4,20.2,3.4z M19,9.7h-4.7V5H19V9.7z M10.9,12.8H3.8c-0.2,0-0.4,0.2-0.4,0.4v7.1
+                                                         c0,0.2,0.2,0.4,0.4,0.4h7.1c0.2,0,0.4-0.2,0.4-0.4v-7.1C11.2,12.9,11.1,12.8,10.9,12.8z M9.7,19H5v-4.7h4.7V19z M20.2,12.8h-7.1
+                                                         c-0.2,0-0.4,0.2-0.4,0.4v7.1c0,0.2,0.2,0.4,0.4,0.4h7.1c0.2,0,0.4-0.2,0.4-0.4v-7.1C20.6,12.9,20.5,12.8,20.2,12.8z M19,19h-4.7
+                                                         v-4.7H19V19z" fill="rgba(255,255,255,1)"/>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </div>
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 右边的图片
+            < 在class中加入hidden-xs可以在小屏幕时将图片隐藏
+            <div class="banner-img-contaienr">
+                <img src="./img/banner.png" alt="header-img" class="img-responsive center-block" />
+            </div> -->
+        </div>
+    </div>
+</header>
+<!--巨幕区域 end-->
+<!--导航+巨幕区域 end-->
+
+<!--内容区域-->
+<div class="animated fadeInUpBig">
+    <div class="contentfixed">
+        <div class="row">
+            <div>
+                <div class="bs-docs-section center-content">
+                    <div class="lead-container PCstyle">
+                        <h3 class="leadtitle"> SuperMap iClient3D for WebGL — 三维“零客户端”开发平台</h3>
+                        <p class="lead" data-aos="fade-down" data-aos-easing="linear" data-aos-duration="500">
+                            基于 WebGL 技术实现的三维客户端开发平台，<br/>可用于构建无插件、跨操作系统、
+                            跨浏览器的三维 GIS 应用程序，可访问SuperMap iServer发布的多种服务、
+                            实现了三维场景可视化浏览、交互操作和地理信息管理等功能。
+                            <br/>通过本产品可快速实现浏览器和移动端上美观、流畅的地图呈现与空间分析。
+                        </p>
+                    </div>
+                    <div class="lead-container phonestyle">
+                        <h3 class="leadtitle">SuperMap iClient3D for WebGL<br/>
+                            GIS网络客户端开发平台<br/>
+                        </h3>
+                        <p class="lead" data-aos="fade-down" data-aos-easing="linear" data-aos-duration="500">
+                            基于现代 Web 技术栈全新构建，是 SuperMap 云 GIS
+                            和在线 GIS 平台系列产品的统一 JavaScript 客户端。集成了领先的开源地图库和可视化库，且核心代码以 Apache License 2.0 协议完全开源，连接了
+                            SuperMap 与开源社区。提供了全新的大数据可视化和数据流可视化功能，通过本产品可快速实现浏览器和移动端上美观、流畅的地图呈现与空间分析。
+                        </p>
+                    </div>
+                    <!--产品,技术Tab-->
+                    <div class="PCstyle product-technology">
+                        <ul id="pctab-title" class="nav nav-tabs">
+                            <li class="col-lg-2 col-md-2 col-sm-2 active">
+                                <a href="#mapBaseMap" data-toggle="tab">
+                                    iClient3D-WebGL
+                                </a>
+                        </ul>
+                        <div id="myTabContent" class="tab-content">
+                            <div class="PCstyle tab-pane fade in active" id="mapBaseMap">
+                                <ul class="productTab nav nav-tabs openSC">
+                                    <li class="active">
+                                        <a href="#iClient-3D" data-toggle="tab">三维场景呈现</a>
+                                    </li>
+                                    <li><a href="#iClient-ol" data-toggle="tab">高真实感三维特效</a>
+                                    </li>
+                                    <li><a href="#iClient-mbgl" data-toggle="tab">三维地理空间分析</a>
+                                    </li>
+                                </ul>
+
+                                <div class="productTabContent tab-content">
+                                    <div class="tab-pane fade in active" id="iClient-3D">
+                                        <div class="row product">
+                                            <div class="product-pic">
+                                                <img class="product-image img-fluid" src="img/ic-3D1.jpg"
+                                                     alt="Generic placeholder image"/>
+                                            </div>
+                                            <div class="product-introduction">
+                                                <h2 class="product-heading">三维场景呈现</h2>
+                                                <span class="product-span"></span>
+                                                <p class="product-text">
+                                                    逼真地呈现倾斜摄影、BIM、精模等多种类型的三维场景
+                                                </p>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="iClient-ol">
+                                        <div class="row product">
+                                            <div class="product-pic">
+                                                <img class="product-image img-fluid" src="img/texiao.jpg"
+                                                     alt="Generic placeholder image"/>
+                                            </div>
+                                            <div class="product-introduction">
+                                                <h2 class="product-heading">高真实感三维特效</h2>
+                                                <span class="product-span"></span>
+                                                <p class="product-text">
+                                                    提供了多种高清的视觉特效，如：烟花、火焰、雨水、喷泉等粒子特效、泛光、扫描线等后处理特效、自发光、特效线等，
+                                                    使场景呈现更生动、绚丽的效果。
+                                                </p>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="iClient-mbgl">
+                                        <div class="row product">
+                                            <div class="product-pic">
+                                                <img class="product-image img-fluid" src="img/fenxi.jpg"
+                                                     alt="Generic placeholder image"/>
+                                            </div>
+                                            <div class="product-introduction">
+                                                <h2 class="product-heading">三维地理空间分析</h2>
+                                                <span class="product-span"></span>
+                                                <p class="product-text">
+                                                    提供丰富的三维空间分析功能，实现复杂的三维空间分析。
+                                                </p>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="tosimple">
+                                <div class="row feature">
+                                    <div class="col-lg-5 image-class">
+                                        <img class="feature-image img-fluid" src="./img/texiao.jpg"
+                                             alt="Generic placeholder image"/>
+                                    </div>
+                                    <div class="col-lg-7">
+                                        <h2 class="product-heading">高真实感三维特效</h2>
+
+                                        <p class="feature-text">
+                                            提供功能完善的接口，并为接口配备详细的API帮助文档，
+                                            使用户对接口的使用变得更加简单易用，同时提供更多功能支持
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!--产品，技术Tab结束-->
+
+                    <!--产品，技术Tab手机端-->
+
+                    <!--产品，技术Tab手机end-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 新特性 -->
+    <div class="new-attributes-start">
+        <div class="new-attributes">
+            <div class="g-heading-v10 g-mb-65">
+                <h1 class="first_title"><b>WHAT'S NEW</b></h1>
+            </div>
+            <!--11alpha新特性-->
+            <div class="phonefontsize"><span class="STYLE14">v11i(2022)Beta</span></div>
+            <div class="panel-body">
+                <div class="news-list">
+
+                    <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                      <div class="news-box">
+                          <p class="new-attributes_content" >平面场景支持Box编辑框交互操作</p>
+                        </div>
+                    </div>
+                    <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                      <div class="news-box">
+                          <p class="new-attributes_content" >平面场景支持TIN地形的坡度坡向分析</p>
+                      </div>
+                    </div>
+                    <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                      <div class="news-box">
+                          <p class="new-attributes_content" >平面场景天际线分析的结果支持设置线宽</p>
+                      </div>
+                    </div>
+                    <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                      <div class="news-box">
+                          <p class="new-attributes_content" >支持加载Cesium在线地形</p>
+                      </div>
+                    </div>
+                    <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                      <div class="news-box">
+                          <p class="new-attributes_content" >支持直接加载.dae、.x、.osgb格式的数据</p>
+                      </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >支持加载带密钥的arcgis服务</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >支持自定义多边形范围裁剪影像图层</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >支持实例化集合自定义请求头</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >支持模型表面雨水、积雪效果</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >支持天地图全球境界服务</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >优化S3M图层浏览时的帧率降低问题</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >优化S3M图层、地形、影像的加载性能</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >优化WebGL在移动端设备上的操作体验</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >S3MBlock缓存支持数据自带或外部文件的PBR效果展示</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >S3M图层支持设置模型拉伸高度</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >S3M图层新增批量设置对象偏移</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >S3M图层多子域加载支持带token</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >MVT支持设置文字换行</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >地形开挖功能，支持抽出地层的效果</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >淹没分析支持渐进式连通性分析、支持水面倒影</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >entity面的外轮廓支持设置线宽</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+						<div class="news-box">
+                           <p class="new-attributes_content" >视频投放支持倾斜照片与倾斜模型的视图融合</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >地质体GPU剖切，支持自动获取数据的颜色或纹理</p>
+                       </div>
+                    </div>
+                </div>
+            </div>
+			<div class="phonefontsize"><span class="STYLE14">v10i(2021)</span>SP1</div>
+            <div class="panel-body">
+                <div class="news-list">
+
+                    <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                      <div class="news-box">
+                          <p class="new-attributes_content" >阴影分析支持以体覆盖形式表达</p>
+                        </div>
+                    </div>
+                    <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                      <div class="news-box">
+                          <p class="new-attributes_content" >新增设置相机视口张角的容限值，通过调整相机视口张角来调整数据显示范围</p>
+                      </div>
+                    </div>
+                    <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                      <div class="news-box">
+                          <p class="new-attributes_content" >平面场景支持设置整体偏移参数，实现带号数据的加载</p>
+                      </div>
+                    </div>
+                    <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                      <div class="news-box">
+                          <p class="new-attributes_content" >平面场景相机操作的操作锚点，由屏幕中心改为鼠标当前位置</p>
+                      </div>
+                    </div>
+                    <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                      <div class="news-box">
+                          <p class="new-attributes_content" >S3M图层支持KTX2.0纹理压缩格式</p>
+                      </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >S3M缓存文字支持随图缩放</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >高度量算支持连续量算</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >优化图层组的加载性能</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >优化模型编辑框操作，提升易用性</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >优化平面场景碰撞检测</p>
+                       </div>
+                    </div>
+					 <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                       <div class="news-box">
+                           <p class="new-attributes_content" >支持加载带有裁剪范围场景的工作空间</p>
+                       </div>
+                    </div>
+                    <div class="news-item">
+                        <div class="decoration">
+                            <div class="news-circle">
+                                <div class="solid-circle"></div>
+                            </div>
+                        </div>
+                        <div class="news-box">
+                            <p class="new-attributes_content" >支持加载带顶点颜色的倾斜摄影模型数据</p>
+                        </div>
+                    </div>
+				  </div>
+                </div>
+        </div>
+    </div>
+<!--10.1.0新特性-->
+</div>
+
+<!--内容区域 end-->
+
+<!--footer -->
+<div class="main-footer icl-footer"></div>
+<script>
+    utils.loadTemplate('.icl-footer', './template/footer.html', navigation);
+
+</script>
+<!--footer end-->
+
+<script type="text/javascript" src="./js/common.js"></script>
+</body>
+<script>
+    // index界面swiper内容
+    $(document).ready(function () {
+
+        // 二级tab按钮
+        $("#GeographicalVisualization").click(
+            function () {
+                setTimeout(() => {
+                    new Swiper('#tabsContent', {
+                        slidesPerView: 6,
+                        spaceBetween: 24,
+                        navigation: {
+                            nextEl: '#butright',
+                            prevEl: '#butleft'
+                        },
+                        roundLengths: true
+                    })
+                }, 200);
+            })
+
+        // 新特性按钮
+        new Swiper('#V-1010-alpha', {
+            slidesPerView: 'auto',
+            spaceBetween: 38,
+            navigation: {
+                nextEl: '#goV1010-alpha',
+                prevEl: '#backV1010-alpha'
+            },
+            roundLengths: true
+        });
+
+        new Swiper('#V-1001', {
+            slidesPerView: 'auto',
+            spaceBetween: 38,
+            navigation: {
+                nextEl: '#goV1001',
+                prevEl: '#backV1001'
+            },
+            roundLengths: true
+        });
+
+        new Swiper('#V-1000', {
+            slidesPerView: 'auto',
+            spaceBetween: 38,
+            navigation: {
+                nextEl: '#goV1000',
+                prevEl: '#backV1000'
+            },
+            roundLengths: true
+        });
+
+        new Swiper('#V-910', {
+            slidesPerView: 'auto',
+            spaceBetween: 38,
+            navigation: {
+                nextEl: '#goV910',
+                prevEl: '#backV910'
+            },
+            roundLengths: true
+        });
+
+        // 手机端的一级tab按钮
+        new Swiper('#phone-nav', {
+            slidesPerView: 'auto',
+            spaceBetween: 32,
+            navigation: {
+                nextEl: '#phone-nav-next',
+            },
+            roundLengths: true
+        });
+
+        //tab下面内容支持手机端滑动。
+        new Swiper('#mapBaseMapContent', {
+            pagination: {
+                el: '#swpp1',
+                clickable: true
+            }
+        });
+        new Swiper('#mapComponentpContent', {
+            observer: true, //修改swiper自己或子元素时，自动初始化swiper
+            observeParents: true, //修改swiper的父元素时，自动初始化swiper
+            pagination: {
+                el: '#swpp2',
+                clickable: true
+            }
+        });
+        new Swiper('#BBVContent', {
+            observer: true, //修改swiper自己或子元素时，自动初始化swiper
+            observeParents: true, //修改swiper的父元素时，自动初始化swiper
+            pagination: {
+                el: '#swpp3',
+                clickable: true
+            }
+        });
+
+        // 去掉手机端what's new部分的swiper
+        let initwindowWidth = $(window).width();
+        deleteSwiper(initwindowWidth);
+        window.addEventListener('resize', function () {
+            let windowWidth = $(window).width();
+            deleteSwiper(windowWidth);
+        })
+
+        function deleteSwiper(width) {
+            if (width < 768) {
+                $("#V-1010-alpha").addClass("swiper-no-swiping");
+                $("#V-1001").addClass("swiper-no-swiping");
+                $("#V-1000").addClass("swiper-no-swiping");
+                $("#V-910").addClass("swiper-no-swiping");
+            }
+        }
+    });
+
+</script>
+
+</html>

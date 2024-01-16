@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - postprocessing - unreal bloom selective</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+<!--	<div id="mapContainer" class="width100percent height100percent">-->
+<!--		<div class="split_up" style="display: none;"></div>-->
+<!--		<div class="split_bottom" style="display: none;"></div>-->
+<!--		<div class="split_left" style="display: none;"></div>-->
+<!--		<div class="split_right" style="display: none;"></div>-->
+<!--		<div class="split_title_1 split_title partcomwithborder">-->
+<!--			<div class="dialogcomwithbordersubcontent height100percent" style="padding:2px; ">-->
+<!--				<div class="dialogcomwithborder-content">-->
+<!--				</div>-->
+<!--			</div>-->
+<!--		</div>-->
+<!--		<div class="split_title_2 split_title partcomwithborder">-->
+<!--			<div class="dialogcomwithbordersubcontent height100percent" style="padding:2px; ">-->
+<!--				<div class="dialogcomwithborder-content">-->
+<!--				</div>-->
+<!--			</div>-->
+<!--		</div>-->
+<!--		<div class="split_title_3 split_title partcomwithborder">-->
+<!--			<div class="dialogcomwithbordersubcontent height100percent" style="padding:2px; ">-->
+<!--				<div class="dialogcomwithborder-content">-->
+<!--				</div>-->
+<!--			</div>-->
+<!--		</div>-->
+<!--		<div class="split_title_4 split_title partcomwithborder">-->
+<!--			<div class="dialogcomwithbordersubcontent height100percent" style="padding:2px; ">-->
+<!--				<div class="dialogcomwithborder-content">-->
+<!--				</div>-->
+<!--			</div>-->
+<!--		</div>-->
+<!--	</div>-->
+	<div id="ThreeContainer" class="width100percent height100percent"></div>
+	<style>
+		#mapContainer{
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100%;
+			width: 100%;
+			margin: 0;
+			overflow: hidden;
+			padding: 0;
+			font-family: sans-serif;
+		}
+		#mapContainer .cesium-viewer-animationContainer,#mapContainer .cesium-viewer-timelineContainer,#mapContainer .cesium-viewer-toolbar{
+			z-index: 1000;
+		}
+
+		/*#ThreeContainer{*/
+		/*	position: absolute;*/
+		/*	top: 0;*/
+		/*	left: 0;*/
+		/*	height: 100%;*/
+		/*	width: 100%;*/
+		/*	margin: 0;*/
+		/*	overflow: hidden;*/
+		/*	padding: 0;*/
+		/*	font-family: sans-serif;*/
+		/*	pointer-events:none;*/
+		/*}*/
+
+		#mapContainer .split_up {
+			position: absolute;
+			background-color: white;
+			left: 50%;
+			bottom: calc(50% + 2px);
+			width: 2px;
+			height: 50%;
+			-webkit-transform: translate(-50%, 0);
+			z-index: 999;
+		}
+
+		#mapContainer .split_bottom {
+			position: absolute;
+			background-color: white;
+			left: 50%;
+			top: calc(50% - 2px);
+			width: 2px;
+			height: 50%;
+			-webkit-transform: translate(-50%, 0);
+			z-index: 999;
+		}
+
+		#mapContainer .split_left {
+			position: absolute;
+			background-color: white;
+			right: 50%;
+			bottom: 50%;
+			height: 2px;
+			width: 50%;
+			-webkit-transform: translate(0, -50%);
+			z-index: 999;
+		}
+
+		#mapContainer .split_right {
+			position: absolute;
+			background-color: white;
+			left: 50%;
+			bottom: 50%;
+			height: 2px;
+			width: 50%;
+			-webkit-transform: translate(0, -50%);
+			z-index: 999;
+		}
+
+		#mapContainer .split_title{
+			background-size: 10px 10px;
+			z-index: 2;
+			height: 30px;
+			color: white;
+			position: absolute;
+			z-index: 2;
+			line-height: 26px;
+			text-align: center;
+			display: none;
+			width: auto;
+			max-width: 350px;
+		}
+
+		#mapContainer .split_title .dialogcomwithborder-content{
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 1;;
+			overflow: hidden;
+			padding: 0 5px;
+			width: calc(100% - 10px);
+		}
+
+		#mapContainer .split_title_1{
+			left: 3%;
+			top: 2%;
+		}
+		#mapContainer .split_title_2{
+			left: 53%;
+			top: 2%;
+		}
+		#mapContainer .split_title_3{
+			left: 53%;
+			top: 52%;
+		}
+		#mapContainer .split_title_4{
+			left: 3%;
+			top: 52%;
+		}
+	</style>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> Click on a sphere to toggle bloom<br>By <a href="http://github.com/Temdog007" target="_blank" rel="noopener">Temdog007</a>
+		</div>
+
+		<script type="x-shader/x-vertex" id="vertexshader">
+
+			varying vec2 vUv;
+
+			void main() {
+
+				vUv = uv;
+
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			}
+
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentshader">
+
+			uniform sampler2D baseTexture;
+			uniform sampler2D bloomTexture;
+
+			varying vec2 vUv;
+
+			void main() {
+
+				gl_FragColor = ( texture2D( baseTexture, vUv ) + vec4( 1.0 ) * texture2D( bloomTexture, vUv ) );
+//gl_FragColor = ( vec4( 1.0 ) * texture2D( bloomTexture, vUv ) );
+			}
+
+		</script>
+
+		<script type="module">
+
+			import * as THREE from './three.module.js';
+
+			import { GUI } from '../datgui/dat.gui.module.js';
+
+			import { OrbitControls } from '../../../src/modules/cesium_three/common/buss/examples/jsm/controls/OrbitControls.js';
+			import { EffectComposer } from '../../../src/modules/cesium_three/common/buss/examples/jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from '../../../src/modules/cesium_three/common/buss/examples/jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from '../../../src/modules/cesium_three/common/buss/examples/jsm/postprocessing/ShaderPass.js';
+			import { UnrealBloomPass } from '../../../src/modules/cesium_three/common/buss/examples/jsm/postprocessing/UnrealBloomPass.js';
+			import { FBXLoader } from '../../../src/modules/cesium_three/common/buss/examples/jsm/loaders/FBXLoader.js';
+
+			const center3=new THREE.Vector3(1000000,1000000,1000000);
+			const ENTIRE_SCENE = 0, BLOOM_SCENE = 1;
+
+			const bloomLayer = new THREE.Layers();
+			bloomLayer.set( BLOOM_SCENE );
+
+			const params = {
+				exposure: 1,
+				bloomStrength: 5,
+				bloomThreshold: 0,
+				bloomRadius: 0,
+				scene: "Scene with Glow",
+
+				ambientlightintensity:0
+			};
+
+			const darkMaterial = new THREE.MeshBasicMaterial( { color: "black" } );
+			const materials = {};
+
+			const renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.toneMapping = THREE.ReinhardToneMapping;
+			let div=document.getElementById('ThreeContainer');
+			div.appendChild(renderer.domElement);
+			//document.body.appendChild( renderer.domElement );
+
+			const scene = new THREE.Scene();
+
+			const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 20000 );
+			camera.position.set( 0+center3.x, 0+center3.y, 2000+center3.z );
+			// camera.lookAt(4746.802734375, 175.5686798095703,  1660.814697265625)
+			camera.lookAt( 0+center3.x, 0+center3.x, 0+center3.x );
+
+			const controls = new OrbitControls( camera, renderer.domElement );
+			controls.maxPolarAngle = Math.PI * 0.5;
+			controls.minDistance = 1;
+			controls.maxDistance = 100;
+			controls.target=new THREE.Vector3(center3.x,center3.y,center3.z);
+			controls.addEventListener( 'change', render );
+
+
+			scene.add( new THREE.AmbientLight( 0x404040 ) );
+
+			const renderScene = new RenderPass( scene, camera );
+
+			const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+			bloomPass.threshold = params.bloomThreshold;
+			bloomPass.strength = params.bloomStrength;
+			bloomPass.radius = params.bloomRadius;
+
+			const bloomComposer = new EffectComposer( renderer );
+			bloomComposer.renderToScreen = false;
+			bloomComposer.addPass( renderScene );
+			bloomComposer.addPass( bloomPass );
+
+			const finalPass = new ShaderPass(
+				new THREE.ShaderMaterial( {
+					uniforms: {
+						baseTexture: { value: null },
+						bloomTexture: { value: bloomComposer.renderTarget2.texture }
+					},
+					vertexShader: document.getElementById( 'vertexshader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
+					defines: {}
+				} ), "baseTexture"
+			);
+			finalPass.needsSwap = true;
+
+			const finalComposer = new EffectComposer( renderer );
+			finalComposer.addPass( renderScene );
+			finalComposer.addPass( finalPass );
+
+			const raycaster = new THREE.Raycaster();
+
+			const mouse = new THREE.Vector2();
+
+			window.addEventListener( 'pointerdown', onPointerDown );
+
+			const gui = new GUI();
+
+
+
+
+			gui.add(params,'ambientlightintensity',0,10,0.1).onChange(function (value) {
+				if(value>0){
+					if(params.ambientlight==null){
+						params.ambientlight=new THREE.AmbientLight(0xFFFFFF, value);
+						scene.add(params.ambientlight);
+					}
+					else{
+						params.ambientlight.intensity=value;
+					}
+				}
+			});
+
+
+			gui.add( params, 'scene', [ 'Scene with Glow', 'Glow only', 'Scene only' ] ).onChange( function ( value ) {
+
+				switch ( value ) 	{
+
+					case 'Scene with Glow':
+						bloomComposer.renderToScreen = false;
+						break;
+					case 'Glow only':
+						bloomComposer.renderToScreen = true;
+						break;
+					case 'Scene only':
+						// nothing to do
+						break;
+
+				}
+
+				render();
+
+			} );
+
+			const folder = gui.addFolder( 'Bloom Parameters' );
+
+			folder.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
+
+				renderer.toneMappingExposure = Math.pow( value, 4.0 );
+				render();
+
+			} );
+
+			folder.add( params, 'bloomThreshold', 0.0, 1.0 ).onChange( function ( value ) {
+
+				bloomPass.threshold = Number( value );
+				render();
+
+			} );
+
+			folder.add( params, 'bloomStrength', 0.0, 10.0 ).onChange( function ( value ) {
+
+				bloomPass.strength = Number( value );
+				render();
+
+			} );
+
+			folder.add( params, 'bloomRadius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) {
+
+				bloomPass.radius = Number( value );
+				render();
+
+			} );
+
+			setupScene();
+
+
+
+			function onPointerDown( event ) {
+
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+				raycaster.setFromCamera( mouse, camera );
+				const intersects = raycaster.intersectObjects( scene.children );
+				if ( intersects.length > 0 ) {
+					const object = intersects[ 0 ].object;
+					object.layers.toggle( BLOOM_SCENE );
+					render();
+
+				}
+
+			}
+
+			window.onresize = function () {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+				bloomComposer.setSize( width, height );
+				finalComposer.setSize( width, height );
+
+				render();
+
+			};
+
+			function setupScene() {
+
+				scene.traverse( disposeMaterial );
+				scene.children.length = 0;
+
+
+
+				const fbxloader=new FBXLoader();
+				fbxloader.load('http://192.168.1.134:8180/data/test.FBX',function (obj) {
+					obj.position.set(-4746.802734375+center3.x, -175.5686798095703+center3.x,  -1660.814697265625+center3.x)
+					scene.add(obj);
+				})
+
+
+				const particles = 5000;
+
+				const geometry = new THREE.BufferGeometry();
+
+				const positions = [];
+				const colors = [];
+
+				const color = new THREE.Color();
+
+				const n = 100, n2 = n / 2; // particles spread in the cube
+
+				for ( let i = 0; i < particles; i ++ ) {
+
+					// positions
+
+					const x = Math.random() * n - n2;
+					const y = Math.random() * n - n2;
+					const z = Math.random() * n - n2;
+
+					positions.push( x+center3.x, y+center3.x, z+center3.x );
+
+					// colors
+
+					const vx = ( x / n ) + 0.5;
+					const vy = ( y / n ) + 0.5;
+					const vz = ( z / n ) + 0.5;
+
+					color.setRGB( vx, vy, vz );
+
+					colors.push( color.r, color.g, color.b );
+
+				}
+
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+				geometry.computeBoundingSphere();
+
+				//
+
+				const material = new THREE.PointsMaterial( { size: 1, vertexColors: true } );
+				// const material = new THREE.PointsMaterial( { size: 15,  color: 0xff0000 } );
+
+				let points = new THREE.Points( geometry, material );
+				points.layers.enable( BLOOM_SCENE );
+				scene.add( points );
+				// const geometry = new THREE.IcosahedronGeometry( 1, 15 );
+				//
+				// for ( let i = 0; i < 500; i ++ ) {
+				//
+				// 	const color = new THREE.Color();
+				// 	color.setHSL( Math.random(), 0.7, Math.random() * 0.2 + 0.05 );
+				//
+				// 	const material = new THREE.MeshBasicMaterial( { color: color } );
+				// 	const sphere = new THREE.Mesh( geometry, material );
+				// 	sphere.position.x = Math.random() * 100 - 50;
+				// 	sphere.position.y = Math.random() * 100 - 5;
+				// 	sphere.position.z = Math.random() * 100 - 50;
+				// 	sphere.position.normalize().multiplyScalar( Math.random() * 40 + 20 );
+				// 	sphere.scale.setScalar( Math.random() * Math.random() + 0.5 );
+				// 	scene.add( sphere );
+				//
+				// 	if ( Math.random() < 0.25 ) sphere.layers.enable( BLOOM_SCENE );
+				//
+				// }
+
+				render();
+
+			}
+
+
+
+			function disposeMaterial( obj ) {
+
+				if ( obj.material ) {
+
+					obj.material.dispose();
+
+				}
+
+			}
+
+			function render() {
+
+				switch ( params.scene ) {
+
+					case 'Scene only':
+						renderer.render( scene, camera );
+						break;
+					case 'Glow only':
+						renderBloom( false );
+						break;
+					case 'Scene with Glow':
+					default:
+						// render scene with bloom
+						renderBloom( true );
+
+						// render the entire scene, then render bloom scene on top
+						finalComposer.render();
+						break;
+
+				}
+
+			}
+
+			function renderBloom( mask ) {
+
+				if ( mask === true ) {
+
+					scene.traverse( darkenNonBloomed );
+					bloomComposer.render();
+					scene.traverse( restoreMaterial );
+
+				} else {
+
+					camera.layers.set( BLOOM_SCENE );
+					bloomComposer.render();
+					camera.layers.set( ENTIRE_SCENE );
+
+				}
+
+			}
+
+			function darkenNonBloomed( obj ) {
+
+				if ( obj.isMesh && bloomLayer.test( obj.layers ) === false ) {
+
+					materials[ obj.uuid ] = obj.material;
+					obj.material = darkMaterial;
+
+				}
+
+			}
+
+			function restoreMaterial( obj ) {
+
+				if ( materials[ obj.uuid ] ) {
+
+					obj.material = materials[ obj.uuid ];
+					delete materials[ obj.uuid ];
+
+				}
+
+			}
+
+		</script>
+
+	</body>
+
+</html>

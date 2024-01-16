@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>token的使用手册</title>
+    <link rel="shortcut icon" type="image/x-icon" href="../../web/img/favicon.ico"/>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <script type="text/javascript" include="jquery,bootstrap,template,admin-lte,jquery.scrollto,lazyload"
+            src="../js/include-web.js" from="doc"></script>
+    <link rel="stylesheet" href="../css/common.css"/>
+    <link rel="stylesheet" href="../css/examples.css"/>
+    <link rel="stylesheet" href="../css/header.css"/>
+    <link rel='stylesheet' href='../css/sm-extend.css'/>
+    <link rel='stylesheet' href='../css/sm-doc.css' />
+</head>
+<body class="hold-transition skin-blue sidebar-mini" data-spy="scroll" data-target="#scrollSpy">
+<!-- ./wrapper -->
+
+<header class="header-wrapper main-header icl-header"></header>
+<script>
+    var navigation = {
+        nav: {
+            title: 'SuperMap iClient3D for WebGL',
+            path: '../../web/',
+            isLocal: window.isLocal
+        }
+    };
+    identification = {};
+    utils.loadTemplate('.icl-header', '../template/header.html', navigation);
+</script>
+
+<!-- ./wrapper -->
+<div class="wrapper"></div>
+
+<div id='container' class='container' style="width: 90%; padding-top: 75px;">
+    <div class='page-header'>
+        <h1>token的使用手册</h1>
+        <hr/>
+        <h2 class="title">概述<a name="Summary"> </a></h2>
+        <p>token，意为“令牌”，是由服务端生成的字符串。SuperMap支持通过SuperMap iServer(以下简称：iServer)
+            和SuperMap iClient3D for WebGL(以下简称：WebGL客户端)配合使用token，指定可访问服务的用户，为发布的服务保密。 </p>
+        <p><strong>使用场景：</strong>给iServer发布的服务加密，只让部分用户访问，提高服务的安全性。</p>
+        <p>本文阐述了利用iServer给服务加密，WebGL客户端和iServer配合使用token访问加密服务的方法和详细流程，主要包含以下步骤：</p>
+        <ol>
+            <ol class="list">
+                <li><a href="#01Publish3DService">发布三维服务</a></li>
+                <li><a href="#02SetAccess">给服务设置访问权限</a></li>
+                <li><a href="#03CreatToken">生成token</a></li>
+                <li><a href="#04BrowseModel">WebGL端通过token访问服务</a></li>
+            </ol>
+        </ol>
+        <!--<p>BIM或精细模型生成OSGB缓存后，第2-3步骤与倾斜摄影模型处理方法相同，
+        此部分操作可直接参照<a href="LoadObliqueModel_OperateTopic.html" target="_blank"> WebGL加载倾斜摄影模型操作手册</a>。本文档主要阐述了BIM或精细模型如何生成OSGB缓存的操作过程。</p>-->
+        <h2 class="title">操作流程<a name="OperationFlow"></a></h2>
+        <p>本文将以CBD精模缓存为例，演示token的使用流程。 </p>
+
+        <h3><a name="01Publish3DService"></a>1.发布三维服务</h3>
+        <h4>操作说明</h4><br>
+        <p> 利用SuperMap iDesktop桌面产品将CBD数据集生成S3MB缓存，并在SuperMap iServer上发布服务。
+            此部分可以参考<a href="LoadBIM_OperateTopic.html" target="_blank">加载BIM及精细模型操作手册</a>。</p>
+
+        <h3><a name="02SetAccess"></a>2. 给服务设置访问权限</h3>
+        <h4>操作步骤</h4>
+        <p>(1).发布三维服务后，从“<strong>服务管理</strong>”页面进入，找到该服务，点击“<strong>安全</strong>”，
+            再点击服务右边的“<strong>小锁</strong>”图标。如图1所示：</p>
+        <div class="pageImage"><img src="../images/TopicDOC/token1.jpg" >
+            <p class="pfont">图 1：服务安全管理页面</p>
+        </div>
+        <p>(2).点击图标后出现一个弹窗，默认选中匿名用户可访问，点击“<strong>指定用户可访问</strong>”，出现以下选项，根据需要添加角色，
+            点击“<strong>确定</strong>”，便为服务设置了权限。</p>
+        <div class="pageImage"><img src="../images/TopicDOC/token2.jpg">
+            <p>图2：权限设置对话框</p>
+        </div>
+        <p>此时若退出iServer账户直接通过WebGL客户端访问该服务，浏览器会报错。</p>
+
+        <h3><a name="03CreatToken"></a>3. 生成token</h3>
+        <h4>使用说明</h4><br>
+        <p>此步骤将获取已设置访问权限的服务的token。</p>
+        <h4>操作步骤</h4><br>
+        <p>(1).在服务管理页面的右上角，点击该页面上方的“<strong>用户名</strong>”，选择“<strong>详细信息</strong>”：</p>
+        <div class="pageImage"><img src="../images/TopicDOC/token3.jpg">
+            <p>图2：token的生成1</p>
+        </div>
+        <p>(2).在页面右上角单击用户名，选择“<strong>令牌</strong>”：</p>
+        <div class="pageImage"><img src="../images/TopicDOC/token4.jpg">
+            <p>图2：token的生成2</p>
+        </div>
+        <p>(3).然后根据需要选择客户端标识类型和有效期，单击“<strong>生成令牌</strong>”按钮，即可获取token。</p>
+        <div class="pageImage"><img src="../images/TopicDOC/token5.jpg">
+            <p>图2：token的生成3</p>
+        </div>
+
+
+
+
+
+        <h3><a name="04BrowseModel"></a>4. WebGL端通过token访问服务</h3>
+        <h4>使用说明</h4><br>
+        <p>对于通过iSever token加密的服务，如果WebGL端直接调用，场景不能加载并且浏览器端会报错：</p>
+        <div class="pageImage"><img src="../images/TopicDOC/token6.jpg">
+            <p>图2：未使用token访问加密服务报错</p>
+        </div>
+        <h4>操作步骤</h4><br>
+        <p>在WebGL客户端的相应范例中通过下图中的语句加入从iServer获取的token</p>
+        <div class="pageImage"><img src="../images/TopicDOC/token7.jpg">
+            <p>图2：在范例中加入token</p>
+        </div>
+        <h4>操作结果</h4><br>
+        <p>加入token后，打开网页，相机飞到相应位置，显示效果如下： </p>
+        <div class="pageImage"><img src="../images/TopicDOC/token8.jpg">
+            <p>图2：使用token后正常访问服务效果</p>
+        </div>
+    </div>
+</div>
+<!--法律申明-->
+<div style="background-color: #1c1c1c;color: rgba(222,222,222,0.71)" class="icl-copyright" data-i18n="footer.copyright">版权所有 © 2000-2020 北京超图软件股份有限公司 京ICP备11032883号-8
+    京公网安备11010502008721 甲测资字11002074
+</div>
+<!--footer end-->
+<script type="text/javascript" src="../js/utils.js"></script>
+</body>
+</html>

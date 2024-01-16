@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>加载BIM及精细模型操作手册</title>
+		<link rel="shortcut icon" type="image/x-icon" href="../../web/img/favicon.ico"/>
+		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+		<script type="text/javascript" include="jquery,bootstrap,template,admin-lte,jquery.scrollto,lazyload"
+				src="../js/include-web.js" from="doc"></script>
+		<link rel="stylesheet" href="../css/common.css"/>
+		<link rel="stylesheet" href="../css/examples.css"/>
+		<link rel="stylesheet" href="../css/header.css"/>
+		<link rel='stylesheet' href='../css/sm-extend.css'/>
+		<link rel='stylesheet' href='../css/sm-doc.css' />
+	</head>
+	<body class="hold-transition skin-blue sidebar-mini" data-spy="scroll" data-target="#scrollSpy">
+	<!-- ./wrapper -->
+
+	<header class="header-wrapper main-header icl-header"></header>
+	<script>
+        var navigation = {
+            nav: {
+                title: 'SuperMap iClient3D for WebGL',
+                path: '../../web/',
+                isLocal: window.isLocal
+            }
+        };
+        identification = {};
+        utils.loadTemplate('.icl-header', '../template/header.html', navigation);
+	</script>
+		<!-- ./wrapper -->
+		<div class="wrapper"></div>
+
+		<div id='container' class='container' style="width: 90%; padding-top: 75px;">
+			<div class='page-header'>
+				<h1>加载BIM及精细模型操作手册</h1>
+				<hr/>
+				<h2 class="title">概述<a name="Summary"> </a></h2>
+				<p>SuperMap支持模型数据集、复合数据集生成三维切片缓存（S3M），为了优化模型在网络环境中的传输和解析，SuperMap iClient3D  for WebGL(以下简称WebGL客户端)采用三维切片缓存（*.S3MB）格式存储与发布模型数据，可提高浏览性能和效率。 </p>
+				<p>借鉴于“WebGL客户端加载倾斜摄影模型”的思路，WebGL客户端加载BIM、精细模型亦可按相似过程处理，WebGL客户端实现浏览BIM及精细模型数据的大致操作流程有以下： </p>
+				<ol>
+					<ol class="list">
+						<li><a href="#01CreatS3M">生成三维切片缓存</a></li>
+						<li><a href="#02Publish3DService">发布三维服务</a></li>
+						<li><a href="#03BrowseModel">客户端浏览三维模型</a></li>
+					</ol>
+				</ol>
+				<p>BIM或精细模型生成三维切片缓存后，第2-3步骤与倾斜摄影模型处理方法相同，此部分操作可直接参照<a href="LoadObliqueModel_OperateTopic.html" target="_blank"> WebGL加载倾斜摄影模型操作手册</a>。本文档主要阐述了BIM或精细模型如何生成三维切片缓存的操作过程。</p>
+				<h2 class="title">操作流程<a name="OperationFlow"></a></h2>
+				<p>下面将以示例数据“鸟巢五期”作详细操作演示。 </p>				
+				<h3><a name="01CreatS3M"></a>1. 生成三维切片缓存</h3>
+				<h4>操作说明</h4>
+				<p>SuperMap iDesktop支持模型数据集直接生成三维切片缓存。</p>
+				<h4>操作步骤</h4>
+				<p>详细信息请参见<strong>SuperMap iDesktop 10i Help.chm</strong>里的"<strong>生成三维切片缓存</strong>"。</p>
+				<h4>操作结果</h4>
+				<p>目标文件夹中存在着一个scp文件，一个json文件及众多的Tile文件夹。scp是配置文件，便于产品加载模型。attribute.json存的是属性字段。而右边对于的tile文件下有索引文件，属性信息文件和对应的s3mb切片文件。 </p>
+				<div class="pageImage"><img src="../images/TopicDOC/LoadBIM_OSGB2S3MResult.png" width="461" height="475">
+					<p>图 4：生成三维切片缓存结果</p>
+				</div>
+				<h3><a name="02Publish3DService"></a>2. 发布三维服务</h3>
+				<h4>使用说明</h4><br>
+				<p>此步骤将S3MB的模型以三维服务的形式发布到本地或远程服务器上。</p>
+				<h4>操作步骤</h4><br>
+				<p>详细操作请参照 <a href="LoadObliqueModel_OperateTopic.html" target="_blank">WebGL加载倾斜摄影模型操作手册</a>。</p>
+				<h4>操作结果</h4><br>
+				<p>本操作发布了一个名为“OSGB_niaocaoModel”的三维服务，见如下图的服务列表。 </p>
+				<div class="pageImage"><img src="../images/TopicDOC/LoadBIM_PublishResult.png" width="513" height="242">
+					<p>图 5：三维服务下显示新发布的服务</p>
+				</div>
+				<h3><a name="03BrowseModel"></a>3. 客户端浏览三维模型</h3>
+				<h4>使用说明</h4><br>
+				<p>发布三维服务后，使用WebGL产品包“<strong>examples/webgl/S3MTiles_niaochao_water.html</strong>“范例打开服务。</p>
+				<h4>操作步骤</h4><br>
+				<p>详细操作参考 <a href="LoadObliqueModel_OperateTopic.html" target="_blank">WebGL加载倾斜摄影模型操作手册</a>。 </p>
+				<h4>操作结果</h4><br>
+				<p>打开网页后，相机飞至精细模型所在位置，显示效果如下图： </p>
+				<div class="pageImage"><img src="../images/TopicDOC/LoadBIM_BrowseModel.jpg">
+					<p>图 6：WebGL浏览精细模型效果图</p>
+				</div>
+			</div>
+		</div>
+		<!--法律申明-->
+		<div style="background-color: #1c1c1c;color: rgba(222,222,222,0.71)" class="icl-copyright" data-i18n="footer.copyright">版权所有 © 2000-2020 北京超图软件股份有限公司 京ICP备11032883号-8
+			京公网安备11010502008721 甲测资字11002074
+		</div>
+		<!--footer end-->
+		<script type="text/javascript" src="../js/utils.js"></script>
+	</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <title>根据字段设置专题图操作手册</title>
+    <link rel="shortcut icon" type="image/x-icon" href="../../web/img/favicon.ico"/>
+    <script type="text/javascript" include="jquery,bootstrap,template,admin-lte,jquery.scrollto,lazyload"
+            src="../js/include-web.js" from="doc"></script>
+    <link rel="stylesheet" href="../css/common.css"/>
+    <link rel="stylesheet" href="../css/examples.css"/>
+    <link rel="stylesheet" href="../css/header.css"/>
+    <link rel='stylesheet' href='../css/sm-extend.css'/>
+    <link rel='stylesheet' href='../css/sm-doc.css'/>
+
+</head>
+<body class="hold-transition skin-blue sidebar-mini" data-spy="scroll" data-target="#scrollSpy">
+<!-- ./wrapper -->
+
+<header class="header-wrapper main-header icl-header"></header>
+<script>
+    var navigation = {
+        nav: {
+            title: 'SuperMap iClient3D for WebGL',
+            path: '../../web/',
+            isLocal: window.isLocal
+        }
+    };
+    identification = {};
+    utils.loadTemplate('.icl-header', '../template/header.html', navigation);
+</script>
+
+
+<div class="wrapper"></div>
+<div id='container' class='container' style="width: 90%; padding-top: 75px;">
+    <div class='page-header'>
+        <h1>根据字段设置专题图操作手册</h1>
+        <hr/>
+        <h2 class="title">概述<a name="Summary"> </a></h2>
+        <p>在数据处理的过程中，常常存在需要根据某一字段，按照一定的标准将该字段的属性值分段统计的情况。
+            此时，用不同的颜色表示该字段的不同取值范围，会让该属性各个分段的取值量和地理空间分布情况显得更加一目了然。
+            如：某一城市超高楼层的数量和分布情况，城市土地的利用情况等，利用专题图，可以更加方便地进行数据空间分布统计。</p>
+        <p>目前，SuperMap iClient3D for WebGL支持了根据指定字段名称查询字段属性，并且支持根据字段属性中选定的值设置其特征。</p>
+
+        <p>本文档将依照范例的效果,详细说明如何实现根据字段设置专题图效果。其主要操作流程如下： </p>
+        <ol>
+            <ol class="list">
+                <li><a href="#01PrepareData">数据准备</a></li>
+                <li><a href="#02Monomer">生成白膜缓存</a></li>
+                <li><a href="#03CreatS3M">发布三维服务</a></li>
+                <li><a href="#04loadData">客户端加载数据</a></li>
+                <li><a href="#05setThematicMap">设置专题图</a></li>
+            </ol>
+        </ol>
+        <h2 class="title">操作流程</h2>
+        <p>下面将以重庆部分建筑数据为例，演示专题图的生成过程。</p>
+        <h3><a name="01PrepareData"></a>1.数据准备</h3>
+        <h4>操作步骤：</h4>
+        <p>（1）在Super Map桌面产品（以下简称桌面）中新建球面场景，打开矢量数据集（若您拿到的就是白膜缓存，可直接跳转至3.发布三维服务）：</p>
+        <div class="pageImage"><img src="../images/TopicDOC/imgtm1.png"><br>
+            <p>图1: 矢量数据集示意图</p>
+        </div>
+        <p>（2）在工作空间管理器中，在数据源下单击拟生成白膜缓存的数据集，右键，
+            选择“浏览属性表”，浏览拟生成专题图的字段的值，对其缺省值或者明显不对的值进行处理。</p>
+        <p>若需要增加字段，则在工作空间管理器中，单击选择数据集，右键选择“属性”，在右侧的属性编辑框中选择“属性表”，
+            单击“+”号，此时就新建了一个字段，对其名称和类型等进行编辑，完成后点击“应用”，将新建的字段应用到数据集中。</p>
+        <div class="pageImage"><img src="../images/TopicDOC/imgtm2.png"><br>
+            <p>图2:添加属性字段示意图</p>
+        </div>
+        <h3><a name="02Monomer"></a>2.生成白膜缓存</h3>
+        <h4>操作步骤</h4>
+        <p>(1). 在“三维数据”选项卡中的“生成缓存”组中，单击“面拉伸生成模型缓存”按钮，
+            此时会弹出一个提示框，为了保证缓存生成效率，建议点击“是”。</p>
+        <div class="pageImage"><img src="../images/TopicDOC/imgtm3.png"><br>
+            <p>图3(a),图3(b): 生成矢量白膜功能示意图</p>
+        </div>
+        <p>(2). 然后弹出“面拉伸生成模型缓存”对话框,如下图所示。</p>
+        <div class="pageImage"><img src="../images/TopicDOC/imgtm4.png">
+            <p>图4 面拉伸生成模型缓存</p>
+        </div>
+        <p>单击“添加数据集”按钮，选择要生成缓存的数据集，即上文处理好的数据集。</p>
+        <p><strong>参数设置：</strong></p>
+        <ul>
+            <ul class="disc">
+                <li><strong>缓存名称</strong>：设置生成的缓存的名称。</li>
+                <li><strong>缓存路径</strong>：设置生成的缓存的存储路径。</li>
+                <li><strong>S3M版本</strong>：默认是S3M1.0，若您后续需要选择值为字符串类型的字段设置专题图，此处请选择S3M2.0。</li>
+                <li><strong>文件处理类型</strong>：请根据需要选择是“替换”还是“追加”。</li>
+                <li><strong>瓦片边长</strong>：设置生成的缓存的切片边长，数据的地理范围越大，切片也应相应地增大。</li>
+                <li><strong>拉伸高度</strong>：选择生成的白膜缓存的拉伸高度所依据的字段，一般选择建筑高度。</li>
+                <li>若后续要为白膜设置边框线，请勾选“轮廓线”</li>
+                <li>若需要建筑白膜分层，请勾选“分层”，并为不同的参数选择相应的字段。</li>
+            </ul>
+        </ul>
+        <p>生成的缓存结果如下图所示：</p>
+        <div class="pageImage">
+            <img src="../images/TopicDOC/imgtm5.png">
+            <p>图5 生成的缓存示意图</p>
+        </div>
+        <p>此时，可在桌面中查看生成好的白膜缓存：</p>
+        <div class="pageImage">
+            <img src="../images/TopicDOC/imgtm6.png">
+            <p>图6: 白膜缓存</p>
+        </div>
+
+        <h3><a name="03CreatS3M"></a>3.发布三维服务</h3>
+        <p>在桌面中配置工作空间，在SuperMap iServer中发布为三维服务。具体过程可参考倾斜摄影模型单体化
+            与属性查询操作手册中<a href="AttributeQueryofObliqueModel_OperateTopic.html#04Publish3DService">“发布三维服务和数据服务”</a>部分的说明。
+        </p>
+
+        <h3><a name="04loadData"></a>4. 客户端加载数据</h3>
+        <h4>操作说明</h4>
+        <br>
+        <p>在此步骤加载发布的三维服务，并为数据设置初始化风格。</p>
+        <p>通过下列代码加载服务：</p>
+        <pre>
+					viewer.scene.addS3MTilesLayerByScp(URL_CONFIG.SCP_JINJIANG, {
+						name: 's3m'
+					});
+				</pre>
+        <p>设置加载时的初始化风格，下面的代码为白膜设置黑色的边框：</p>
+        <figure>
+					<pre>
+					<code>
+					for (var j = 0; j < layers.length; j++) {
+   					_layers = layers;
+					layers[j].indexedDBSetting.isGeoTilesRootNodeSave = true;//本地缓存根节点
+					layers[j].residentRootTile = true;// 根节点驻留内存
+
+   					_layers[j].style3D.fillStyle = Cesium.FillStyle.Fill_And_WireFrame;
+    					_layers[j].style3D.lineWidth = 1.0;
+    					_layers[j].style3D.lineColor = new Cesium.Color(0, 0, 0, 1);
+   					_layers[j].wireFrameMode = Cesium.WireFrameType.EffectOutline;  //草图模式，即线框
+					}
+					</code>
+					</pre>
+        </figure>
+        <p>在前端加载的效果如图7所示：</p>
+        <div class="pageImage">
+            <img src="../images/TopicDOC/imgtm7.png">
+            <p>图7：给白膜设置线框</p>
+        </div>
+
+        <h3><a name="05setThematicMap"></a>5. 设置专题图</h3>
+        <h4>操作说明</h4><br>
+        <p>根据字段的不同属性值设置专题图的风格，如下列代码将楼层字段的不同值设置不同的颜色，当然，也可以重新设置模型的边框线样式。</p>
+        <pre>
+					var colorConditions1 = [];
+					colorConditions1.push(['${Floors} < 10','rgb(204,204,0)']);
+					colorConditions1.push([' ${Floors} >= 20','rgb(102,204,255)']);
+					colorConditions1.push([' ${Floors} >= 10 && ${Floors}<20','rgb(255,102,0)']);
+					colorConditions1.push(['true', 'rgb(255,255,255)']);
+					_layers[j].themeStyle = setCesium3DTileStyle(colorConditions1);
+				</pre>
+        <p>效果如图8所示：</p>
+        <div class="pageImage">
+            <img src="../images/TopicDOC/imgtm8.png">
+            <p>图8：根据楼层高度设置专题图效果示意图</p>
+        </div>
+        <p>若您想根据字符串类型的字段来设置专题图，可使用以下方式设置风格：</p>
+        <pre>
+					colorConditions2.push(['${LandUse} === "住宅"', 'rgb(255,153,153)']);
+					colorConditions2.push(['${LandUse} === "商业用地"', 'rgb(102,255,102)']]);
+					colorConditions2.push(['true', 'rgb(255,255,255)']);
+				</pre>
+        <p>效果如图9所示：</p>
+        <div class="pageImage">
+            <img src="../images/TopicDOC/imgtm9.png">
+            <p>图9：根据建筑高度设置专题图效果示意图</p>
+        </div>
+    </div>
+</div>
+<!--法律申明-->
+<div style="background-color: #1c1c1c;color: rgba(222,222,222,0.71)" class="icl-copyright" data-i18n="footer.copyright">版权所有 © 2000-2020 北京超图软件股份有限公司 京ICP备11032883号-8
+    京公网安备11010502008721 甲测资字11002074
+</div>
+<!--footer end-->
+<script type="text/javascript" src="../js/utils.js"></script>
+</body>
+</html>

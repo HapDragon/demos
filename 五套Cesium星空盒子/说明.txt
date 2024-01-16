@@ -1,0 +1,2 @@
+无需改代码，直接替换Cesium默认skybox图片即可。
+图片路径Assets\Textures\SkyBox

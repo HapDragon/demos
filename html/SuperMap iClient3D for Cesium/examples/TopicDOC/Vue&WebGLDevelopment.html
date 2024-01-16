@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>点外挂模型子对象选择操作手册
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <title>Vue+SuperMap iClient3D for WebGL开发注意事项</title>
+    <link rel="shortcut icon" type="image/x-icon" href="../../web/img/favicon.ico"/>
+    <script type="text/javascript" include="jquery,bootstrap,template,admin-lte,jquery.scrollto,lazyload"
+            src="../js/include-web.js" from="doc"></script>
+    <link rel="stylesheet" href="../css/common.css"/>
+    <link rel="stylesheet" href="../css/examples.css"/>
+    <link rel="stylesheet" href="../css/header.css"/>
+    <link rel='stylesheet' href='../css/sm-extend.css'/>
+    <link rel='stylesheet' href='../css/sm-doc.css'/>
+
+</head>
+<body class="hold-transition skin-blue sidebar-mini" data-spy="scroll" data-target="#scrollSpy">
+<!-- ./wrapper -->
+
+<header class="header-wrapper main-header icl-header"></header>
+<script>
+    var navigation = {
+        nav: {
+            title: 'SuperMap iClient3D for WebGL',
+            path: '../../web/',
+            isLocal: window.isLocal
+        }
+    };
+    identification = {};
+    utils.loadTemplate('.icl-header', '../template/header.html', navigation);
+</script>
+
+<div class="wrapper"></div>
+
+<div id='container' class='container' style="width: 90%; padding-top: 75px;">
+    <div class='page-header'>
+        <h1>Vue+SuperMap iClient3D for WebGL开发注意事项</h1>
+        <hr/>
+        <h2 class="title">概述<a name="Summary"> </a></h2>
+        <p>在基于vue框架+SuperMap iClient3D for WebGL产品做三维应用开发的项目中，
+            比较常见的问题是性能卡顿、帧率低。经过排查，发现普遍是由以下问题引起的，现总结出引起相关问题的原因及解决办法，以供参考： </p>
+        <h2 class="title">常见问题及解决方案<a name="OperationFlow"></a></h2>
+        <p><strong>1、如果把Cesium的对象viewer放入到 store、data、computed中，会引起Cesium帧率严重下降的问题。</strong></p>
+        <p>vue响应式框架对页面数据的渲染非常友好，会把data内所有对象的属性都转换成get,set进行监听。
+            但是将Cesium直接挂载到vue的data对象上时（如图1所示），Cesium中数量庞大的对象会影响整个页面的渲染效率，降低帧率，
+            特别是加载大体量模型场景时，影响更加明显。</p>
+        <div class="pageImage"><img src="../images/TopicDOC/vue1.jpg" style="width: 40%">
+            <p>图 1：错误做法</p>
+        </div>
+
+        <p><strong>正确做法:</strong>将viewer对象作为window的全局对象，避免vue劫持viewer，同时方便在其他组件中调用。如图2所示：</p>
+        <div class="pageImage"><img src="../images/TopicDOC/vue2.jpg" style="width: 40%">
+            <p>图2: 正确做法</p>
+        </div>
+
+        <p>2、不仅viewer对象，Cesium下的所有对象都不建议放入到 store、data、computed中，比如handler编辑事件。如图3所示：</p>
+        <div class="pageImage"><img src="../images/TopicDOC/vue3.jpg" style="width: 35%">
+            <p>图 3：错误做法</p>
+        </div>
+        <p>正确做法是将handler编辑事件，定义在data外部。如图4所示： </p>
+        <div class="pageImage"><img src="../images/TopicDOC/vue4.jpg" style="width: 35%">
+            <p>图 4：正确做法</p>
+        </div>
+        <p>3、分析功能等的对象，用完之后要及时销毁，防止出现功能在界面上关闭但对象还驻留在内存中的情况。如图5所示：</p>
+        <div class="pageImage"><img src="../images/TopicDOC/vue5.jpg" style="width: 35%">
+            <p>图 5：销毁使用完的对象</p>
+        </div>
+    </div>
+
+</div>
+<!--footer-->
+<div style="background-color: #1c1c1c;color: rgba(222,222,222,0.71)" class="icl-copyright" data-i18n="footer.copyright">版权所有 © 2000-2020 北京超图软件股份有限公司 京ICP备11032883号-8
+    京公网安备11010502008721 甲测资字11002074
+</div>
+<!--footer end-->
+<script type="text/javascript" src="../js/utils.js"></script>
+</body>
+</html>

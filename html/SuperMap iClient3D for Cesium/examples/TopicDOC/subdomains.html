@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <title>子域环境搭建及使用</title>
+    <link rel="shortcut icon" type="image/x-icon" href="../../web/img/favicon.ico"/>
+    <script type="text/javascript" include="jquery,bootstrap,template,admin-lte,jquery.scrollto,lazyload"
+            src="../js/include-web.js" from="doc"></script>
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/examples.css">
+    <link rel="stylesheet" href="../css/header.css">
+    <link rel='stylesheet' href='../css/sm-extend.css'/>
+    <link rel='stylesheet' href='../css/sm-doc.css'/>
+
+</head>
+<body class="hold-transition skin-blue sidebar-mini" data-spy="scroll" data-target="#scrollSpy">
+<!-- ./wrapper -->
+
+<header class="header-wrapper main-header icl-header"></header>
+<script>
+    var navigation = {
+        nav: {
+            title: 'SuperMap iClient3D for WebGL',
+            path: '../../web/',
+            isLocal: window.isLocal
+        }
+    };
+    identification = {};
+    utils.loadTemplate('.icl-header', '../template/header.html', navigation);
+</script>
+<!-- ./wrapper -->
+<div class="wrapper"></div>
+<div id='container' class='container' style="width: 90%; padding-top: 75px;">
+    <div class='page-header'>
+        <h1>子域环境搭建及使用</h1>
+        <hr/>
+        <h2 class="title">简介</h2>
+        <p>由于浏览器对同一个域名服务的并发请求数量有限制，通过部署多个子域名，加大向iServer发送数据请求的并发量，从而达到提升加载速度的目的。以下以nginx为例搭建环境：</p>
+        <ul>
+            <ul class="circle">
+                <li>描述：利用nginx客户端，映射不同的端口地址来对iServer进行访问，搭建子域环境，提升性能。</li>
+                <li>应用场景：充分利用server机器的硬件性能，加大并发量，提升加载速度。</li>
+            </ul>
+        </ul>
+        <h2 class="title">使用</h2>
+        <h3>1、nginx客户端部署。</h3>
+        <p>
+            修改nginx.conf文件，如下图所示，修改完成重启nginx，则
+            http://localhost:8081/iserver、http://localhost:8082/iserver、http://localhost:8083/iserver
+            都会指向http://localhost:8090/iserver
+        </p>
+        <div class="pageImage">
+            <img src="../images/TopicDOC/nginx.png" style="width: 40%">
+        </div>
+
+        <h3>2、scene.open()打开场景</h3>
+        <p></p>
+        <p>
+        </p>
+        <p>
+        <pre>
+        var promise = viewer.scene.open('http://{s}/iserver/services/3D-CBD/rest/realspace', undefined, {
+            subdomains: ['localhost:8081', 'localhost:8082', 'localhost:8083']//设置子域
+        });
+        </pre>
+        </p>
+
+        <h3>3、scene.addS3MTilesLayerByScp()添加模型</h3>
+        <p></p>
+        <p>
+        </p>
+        <p>
+        <pre>
+        var config = {
+            subdomainConfig: {
+                urlScheme: " http://{s}/iserver/services/3D-CBD/rest/realspace",
+                subdomains: ['localhost:8081', 'localhost:8082', 'localhost:8083']//设置子域
+            },
+            name: "building"
+        };
+
+        var promise = viewer.scene.addS3MTilesLayerByScp('http://localhost:8090/iserver/services/3D-CBD/rest/realspace/datas/building/config', config);
+        Cesium.when(promise, function (layer) {
+            viewer.flyTo(promise);
+        })
+    </pre>
+
+        <h3>4、地形</h3>
+        <p></p>
+        <p>
+        </p>
+        <p>
+        <pre>
+        var viewer = new Cesium.Viewer('cesiumContainer', {
+            terrainProvider: new Cesium.CesiumTerrainProvider({
+                url: ' http://{s}/iserver/services/3D-terrain/rest/realspace/datas/dem',
+                subdomains: ['localhost:8081', 'localhost:8082', 'localhost:8083']//设置子域
+            })
+        });
+    </pre>
+        </p>
+
+        <h3>5、影像</h3>
+        <p></p>
+        <p>
+        </p>
+        <p>
+        <pre>
+        var imageLayer = viewer.imageryLayers.addImageryProvider(new Cesium.SuperMapImageryProvider({
+            url: ' http://{s}/iserver/services/3D-image/rest/realspace/datas/image',
+            subdomains: ['localhost:8081', 'localhost:8082', 'localhost:8083']//设置子域
+        }));
+        viewer.flyTo(imageLayer);
+        </pre>
+        </p>
+
+        <h3>6、mvt</h3>
+
+        <pre>
+    mvtMap = scene.addVectorTilesMap({
+    url: 'http://{s}/services/map-mvt-JingJinDiQuDiTu/restjsr/v1/vectortile/maps/JingJin',
+    subdomains: ['localhost:8081', 'localhost:8082', 'localhost:8083']//设置子域
+    canvasWidth: 512,
+    name: 'testMVT',
+    viewer: viewer
+});
+
+                    </pre>
+        </p>
+
+        <h3>加载效果：从网络请求里看是否有不同端口的请求，比如'localhost:8081', 'localhost:8082', 'localhost:8083'</h3>
+        <div class="pageImage">
+            <img src="../images/TopicDOC/subdomains.png" style="width: 80%">
+        </div>
+    </div>
+</div>
+<!--法律申明-->
+<div style="background-color: #1c1c1c;color: rgba(222,222,222,0.71)" class="icl-copyright" data-i18n="footer.copyright">
+    版权所有 © 2000-2020 北京超图软件股份有限公司 京ICP备11032883号-8
+    京公网安备11010502008721 甲测资字11002074
+</div>
+<!--footer end-->
+<script type="text/javascript" src="../js/utils.js"></script>
+</body>
+</html>

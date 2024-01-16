@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>点外挂模型子对象选择操作手册
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+		<title>根据字段设置专题图操作手册</title>
+		<link rel="shortcut icon" type="image/x-icon" href="../../web/img/favicon.ico"/>
+		<script type="text/javascript" include="jquery,bootstrap,template,admin-lte,jquery.scrollto,lazyload"
+				src="../js/include-web.js" from="doc"></script>
+		<link rel="stylesheet" href="../css/common.css"/>
+		<link rel="stylesheet" href="../css/examples.css"/>
+		<link rel="stylesheet" href="../css/header.css"/>
+		<link rel='stylesheet' href='../css/sm-extend.css'/>
+		<link rel='stylesheet' href='../css/sm-doc.css'/>
+
+	</head>
+<body class="hold-transition skin-blue sidebar-mini" data-spy="scroll" data-target="#scrollSpy">
+<!-- ./wrapper -->
+
+<header class="header-wrapper main-header icl-header"></header>
+<script>
+    var navigation = {
+        nav: {
+            title: 'SuperMap iClient3D for WebGL',
+            path: '../../web/',
+            isLocal: window.isLocal
+        }
+    };
+    identification = {};
+    utils.loadTemplate('.icl-header', '../template/header.html', navigation);
+</script>
+
+		<div class="wrapper"></div>
+
+		<div id='container' class='container' style="width: 90%; padding-top: 75px;">
+			<div class='page-header'>
+				<h1>点外挂模型子对象选择操作手册</h1>
+				<hr/>
+				<h2 class="title">概述<a name="Summary"> </a></h2>
+				<p>点外挂模型是指具有相同材质、形状以及大小，仅仅空间位置和姿态不同的模型，采用模型只存一份，位置信息采用三维点数据集存储的方式存储多个模型数据集的模型统称。这样的方式与实例化有着异曲同工之处，能够实现空间占用和数据量的减少。SuperMap GIS系列产品支持了点外挂模型的生成和处理，为了优化点外挂模型选中时的显示效果，提高浏览器对选中的点外挂模型的渲染效率，SuperMap iClient3D for
+					WebGL(以下简称WebGL客户端)支持了点外挂模型子对象的选择，在WebGL客户端选中模型的子对象时，仅对选中部分进行高亮显示。 </p>
+				<p>本文较详细地阐述了在WebGL客户端实现点外挂模型的加载、浏览及其子对象选择的详细过程。主要过程包括： </p>
+				<ol>
+					<ol class="list">
+						<li><a href="#01CreatCache">点外挂模型缓存生成</a></li>
+						<li><a href="#02Publish3DService">三维服务的发布</a></li>
+						<li><a href="#03ChooseBranchObject">WebGL客户端的浏览和子对象选择</a></li>
+					</ol>
+				</ol>
+
+				<h2 class="title">操作流程<a name="OperationFlow"></a></h2>
+				<p>本文以铁路轨道模型数据为例进行详细操作演示。 </p>
+				<h3><a name="01CreatCache"></a>1.点外挂模型缓存生成</h3>
+				<h4>操作步骤</h4><br>
+				<p>(1).在SuperMap iDesktop桌面产品的工作空间管理器中，打开需要生成缓存模型的数据源。  </p>
+
+				<p>(2).在“<strong>三维数据</strong>”选项卡的“<strong>生成缓存</strong>”组中，
+					选择“<strong>点集生成缓存外挂模型</strong>”。 </p>
+                <div class="pageImage"><img src="../images/TopicDOC/skeletonSelection1.jpg" >
+                    <p>图 1：“点集生成缓存外挂模型”功能位置示意图</p>
+                </div>
+				<p>(3).弹出“<strong>点外挂模型生成缓存</strong>”对话框（如图2所示），点击第一行的“<strong>添加数据集</strong>”按钮，选择拟生成缓存的数据集。  </p>
+                <div class="pageImage"><img src="../images/TopicDOC/skeletonSelection2.jpg">
+                    <p>图 2：“点外挂模型生成缓存”对话框</p>
+                </div>
+                <p>(4).设置参数，如图2左下红色框线内所示：</p>
+				<ul>
+					<ul class="disc">
+						<li><strong>缓存名称：</strong>设置生成的点外挂模型缓存的名称；</li>
+						<li><strong>缓存路径：</strong>设置模型缓存的存储路径; </li>
+						<li><strong>文件类型：</strong>新版本的SuperMap iDesktop桌面产品仅支持生成S3MB格式的缓存; </li>
+						<li><strong>线程数：</strong>默认为4;  </li>
+						<li><strong>过滤阈值：</strong>设置过滤粗糙层子对象的参数，单位为像素。若设置为2，表示小于2像素的子对象将被过滤掉， 默认为0，即不过滤;  </li>
+						<li><strong>瓦片边长：</strong>显示和设置瓦片的边长，单位：米。瓦片边长的不同对应着比例尺的不同，
+							将鼠标移动至标签后的问号处即可查看瓦片边长与比例尺、层级的对应关系;  </li>
+						<li><strong>批量生成：</strong>设置是否批量缓存，若勾选则批量生成，即多个数据集生成一个缓存文件; </li>
+					</ul>
+				</ul>
+				<p>(5).设置模型参数，如图2右下红色框线内所示：</p>
+				<ul>
+					<ul class="disc">
+						<li><strong>模型文件路径：</strong>指定字段作为模型文件路径，这里的路径是绝对路径；</li>
+						<li><strong>对象ID字段：</strong>设置唯一标识ID的字段；</li>
+						<li><strong>矩阵字段：</strong>勾选时，选择数据的字段作为旋转缩放的参数。不勾选时，用户自定义X/Y/Z的旋转和缩放参数；</li>
+						<li><strong>LOD层级数：</strong>设置缓存的LOD层级数。</li>
+					</ul>
+				</ul>
+				<p>(6).点击“<strong>生成</strong>”按钮，生成点外挂模型缓存。 </p><br>
+				<h4>操作结果</h4><br>
+				<p>生成完成后，在设置的缓存路径下能看到缓存文件，如图3所示。 </p>
+                <div class="pageImage"><img src="../images/TopicDOC/skeletonSelection3.jpg" width="426" height="394" >
+                    <p>图 3：点集生成外挂模型缓存结果</p>
+                </div>
+
+				<!--<div class="pageImage"><img src="../images/TopicDOC/LoadBIM_SceneCacheResult.png" width="438" height="491">-->
+					<!--<p>图 3：生成OSGB缓存结果</p>-->
+				<!--</div>-->
+
+				<h3><a name="02Publish3DService"></a>2. 三维服务的发布</h3>
+				<h4>操作说明</h4>
+				<p>在桌面添加上一步生成的点外挂模型缓存并保存成工作空间，在SuperMap iServer上发布成服务。</p>
+				<h4>操作步骤</h4>
+				<p>具体操作流程可参考<a href="LoadObliqueModel_OperateTopic.html" target="_blank">加载倾斜摄影模型操作手册</a>
+					中的第3步：“<strong>发布三维服务</strong>”</p>
+				<br>
+				<h3><a name="03BrowseModel"></a>3.WebGL客户端的浏览和子对象选择</h3>
+				<h4>操作步骤</h4><br>
+				<p>(1).发布三维服务后，进入服务的<strong>“根目录”</strong>页面，点击<strong>“realspace”</strong>，复制浏览器地址栏的<strong>url</strong>地址。详细操作过程可参考 <a href="LoadObliqueModel_OperateTopic.html" target="_blank">加载倾斜摄影模型操作手册</a>。</p>
+				<p>(2).修改WebGL产品包“<strong>examples</strong>”文件夹下范例“<strong>S3MTiles_srsb_water.html</strong>”相关参数</p>
+				<p>
+				<pre>
+                    	var promise = scene.open("http://localhost:8090/iserver/services/3D-DianWaiGua/rest/realspace");</pre>
+				</p>
+				<br>
+<!--				<div class="pageImage"><img src="../images/TopicDOC/skeletonSelection4.png">-->
+<!--					<p>图 4：在范例中调用服务</p>-->
+<!--				</div>-->
+				<p>或者创建新的.html范例文件,通过<strong>scene.open(url)</strong>方法打开服务场景：</p>
+				<p>
+				<pre>
+                    	var promise = scene.open(url);</pre>
+				</p>
+				<br>
+				<p>此时点击场景中的点外挂模型，发现模型的子对象不能被选中，如图5所示：</p>
+
+				<div class="pageImage" id = "img5"><img src="../images/TopicDOC/skeletonSelection5.jpg" width="847" height="514">
+					<p>图 5：点外挂模型选择效果图</p>
+				</div>
+				<br>
+				<p>(3).这是因为图层中子对象的选择设置为关闭状态，通过以下语句，找到模型的点外挂图层并将其子对象设置为可选择：</p>
+				<p>
+				<pre>
+				Cesium.when(promise, function(layers){
+					var skeleton = scene.layers.find ("NewDGN"); //图层名字可在桌面软件或发布的服务中查看
+					skeleton.skeletonSelectEnable = true
+				});
+			</pre>
+				</p>
+				<p>此时再点击模型的，其子对象呈可选中状态，其显示效果如下图所示：</p>
+				<br>
+				<div class="pageImage" id = "img6"><img src="../images/TopicDOC/skeletonSelection6.jpg" width="754" height="515">
+					<p>图 6：点外挂模型子对象选择效果图</p>
+				</div>
+
+			</div>
+		</div>
+	<!--法律申明-->
+	<div style="background-color: #1c1c1c;color: rgba(222,222,222,0.71)" class="icl-copyright" data-i18n="footer.copyright">版权所有 © 2000-2020 北京超图软件股份有限公司 京ICP备11032883号-8
+		京公网安备11010502008721 甲测资字11002074
+	</div>
+	<!--footer end-->
+		<script type="text/javascript" src="../js/utils.js"></script>
+	</body>
+</html>

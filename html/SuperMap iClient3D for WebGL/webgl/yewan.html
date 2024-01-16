@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>夜晚场景渲染</title>
+    <link href="./css/font-awesome.min.css" rel="stylesheet">
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link href="./css/pretty.css" rel="stylesheet">
+    <link href="./css/style.css" rel="stylesheet">
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="./js/bootstrap-select.min.js"></script>
+    <script src="./js/slider.js"></script>
+    <script src="./js/config.js"></script>
+    <script src="./js/tooltip.js"></script>
+    <script src="./js/spectrum.js"></script>
+    <script type="text/javascript" src="./js/initGlobe.js"></script>
+    <script type="text/javascript" src="../../../libs/SuperMap3D/SuperMap3D.js"></script>
+</head>
+<body>
+<div id="Container"></div>
+<script type="module">
+
+    import quardhandler from './js/wqymodules/movingTextures/quard.js'
+
+    function onload(SuperMap3D) {
+        const {SingleTileImageryProvider, BingMapsImageryProvider, BingMapsStyle, SkyBox} = SuperMap3D;
+
+
+        initGlobe("Container");
+        //将底图添加进去
+        // scene.imageryLayers.addImageryProvider(new SuperMap3D.SingleTileImageryProvider({
+        //     url: './images/BlackMarble_2012.jpg'
+        // }));
+        scene.imageryLayers.addImageryProvider(new BingMapsImageryProvider({
+            url: 'https://dev.virtualearth.net',
+            mapStyle: BingMapsStyle.AERIAL,
+            key: URL_CONFIG.BING_MAP_KEY,
+        }));
+        scene.imageryLayers._layers.forEach(item => {
+            item.brightness = 0.1;
+        })
+
+
+
+
+
+
+        scene.camera.setView({
+            destination:  new SuperMap3D.Cartesian3(-2870619.8321989826, 4843774.545420306,2996346.441740754),
+            orientation: {
+                heading : SuperMap3D.Math.toRadians(0.0), // east, default value is 0.0 (north)
+                pitch : SuperMap3D.Math.toRadians(-90),    // default value (looking down)
+                roll : 0.0                             // default value
+            }
+            // destination: new SuperMap3D.Cartesian3.fromDegrees(110.2, 20.0,500000)
+        });
+
+
+
+
+        var promise = scene.open("http://192.168.1.188:8990/iserver/services/3D-DemoScene-2/rest/realspace");
+
+        promise.then(function (layers) {
+            //去掉植被显示，因为树太丑
+            layers.forEach(layer => {
+                if (layer.name == "zhibei_4490@植被")
+                    layer.visible = false;
+            })
+
+        })
+
+        //天空盒
+        let xingkongSkyBox = new SkyBox({
+            nearGround: true,
+            sources: {
+                positiveX:"/五套Cesium星空盒子/4/tycho2t3_80_px.jpg",
+                negativeX:"/五套Cesium星空盒子/4/tycho2t3_80_mx.jpg",
+                positiveY:"/五套Cesium星空盒子/4/tycho2t3_80_py.jpg",
+                negativeY:"/五套Cesium星空盒子/4/tycho2t3_80_my.jpg",
+                positiveZ:"/五套Cesium星空盒子/4/tycho2t3_80_pz.jpg",
+                negativeZ:"/五套Cesium星空盒子/4/tycho2t3_80_mz.jpg"
+
+                // positiveX: "./images/SkyBox/Night/Right.png",
+                // negativeX: "./images/SkyBox/Night/Left.png",
+                // positiveY: "./images/SkyBox/Night/Front.png",
+                // negativeY: "./images/SkyBox/Night/Back.png",
+                // positiveZ: "./images/SkyBox/Night/Up.png",
+                // negativeZ: "./images/SkyBox/Night/Down.png"
+            }
+        });
+        let defaultSkyBox = scene.skyBox;
+        let currentSkyBox = xingkongSkyBox;
+        scene.skyBox = currentSkyBox;
+        scene.skyAtmosphere.show = false;
+        //拾取点击点的坐标
+        // var screenSpaceEventHandler = new SuperMap3D.ScreenSpaceEventHandler(scene.canvas);
+        // screenSpaceEventHandler.setInputAction(function (evt) {
+        //     var cartesian = scene.pickPosition(evt.position);
+        //     // console.log(cartesian);
+        //     let cartographic = SuperMap3D.Ellipsoid.WGS84.cartesianToCartographic(cartesian);
+        //     cartographic.longitude = SuperMap3D.Math.toDegrees(cartographic.longitude);
+        //     cartographic.latitude = SuperMap3D.Math.toDegrees(cartographic.latitude);
+        //     console.log(`${cartographic.longitude},${cartographic.latitude},${cartographic.height}`);
+        // }, SuperMap3D.ScreenSpaceEventType.LEFT_CLICK);
+        // //
+        // // let postrenderfunc = function () {
+        // //     var cameraHeight = scene.camera.positionCartographic.height;
+        // //     var toggleHeight = 23e4;
+        // //     if (cameraHeight < toggleHeight) {
+        // //         scene.skyBox = currentSkyBox;
+        // //         scene.skyAtmosphere.show = false;
+        // //     } else {
+        // //         scene.skyBox = defaultSkyBox;
+        // //         scene.skyAtmosphere.show = true;
+        // //     }
+        // //     requestAnimationFrame(postrenderfunc);
+        // // }
+        // // requestAnimationFrame(postrenderfunc);
+        //
+        //
+        //设置夜景
+        scene.sun.show = false;
+        scene.lightSource.ambientLightColor = new SuperMap3D.Color(0.05, 0.08, 0.05, 0.9);
+        // 新增直射光-整个环境
+        // S {longitude: 120.65169270186344, latitude: 28.017702646711633, height: -0.10904066311122514}
+        // yewan.html:71 S {longitude: 120.65096325247782, latitude: 28.021513304485264, height: -0.10798530628450395}
+        let dirLightPosition0 = SuperMap3D.Cartesian3.fromDegrees(120.65132797717063, 28.0196079755984485, 800);
+        var dirLightOptions0 = {
+            targetPosition: SuperMap3D.Cartesian3.fromDegrees(120.65132797717063, 28.0196079755984485, 0),
+            color: new SuperMap3D.Color(0.015, 0.014, 0.026, 1.0),
+            intensity: 5
+        };
+        scene.addLightSource(new SuperMap3D.DirectionalLight(dirLightPosition0, dirLightOptions0));
+        // // 新增点光源-整个环境
+        // let polightPosotion0 = SuperMap3D.Cartesian3.fromDegrees(120.65158832909164, 28.019688359540567, 400)
+        // let pointLightOptions0 = {
+        //     cutoffDistance: 2000,
+        //     // color: new SuperMap3D.Color(0.05, 0.1, 0.42, 1.0),
+        //     color: new SuperMap3D.Color(0.04, 0.18, 0.23, 1.0),
+        //     intensity: 1
+        // };
+        // scene.addLightSource(new SuperMap3D.PointLight(polightPosotion0, pointLightOptions0));
+        //
+        //
+        // let pointlightPositionDiwuList = [
+        //     SuperMap3D.Cartesian3.fromDegrees(120.65213339851782,28.01877685509171,14.028644161629812),
+        //     // SuperMap3D.Cartesian3.fromDegrees(120.65167078873554, 28.019131886836465, 20),
+        //     // SuperMap3D.Cartesian3.fromDegrees(120.65186385127173, 28.019420656287547, 22.95883147959269),
+        //     // SuperMap3D.Cartesian3.fromDegrees(120.65090638337948, 28.019482211259934, 15.16520668198074),
+        //     // SuperMap3D.Cartesian3.fromDegrees(120.65112995916806, 28.020079399730545, 16.27476463932858),
+        //     // SuperMap3D.Cartesian3.fromDegrees(120.6513048239441, 28.0198459439779, 12.290207971972409),
+        //     // SuperMap3D.Cartesian3.fromDegrees(120.6521191163434, 28.019905697068825, 22.705043297377518),
+        //     // SuperMap3D.Cartesian3.fromDegrees(120.65258281812524, 28.02067098707494, 16.062608231326553),
+        //     // SuperMap3D.Cartesian3.fromDegrees(120.65259222820531, 28.020200481533557, 16.12133338379565),
+        // ];
+        // var pointLightOptionsDiwu = {
+        //     cutoffDistance: 60.0,
+        //     color: new SuperMap3D.Color(0.7, 0.7, 1.0, 1.0),
+        //     intensity:1.12,
+        //     // intensity: 0.22
+        // };
+        // pointlightPositionDiwuList.forEach(pos => {
+        //     scene.addLightSource(new SuperMap3D.PointLight(pos, pointLightOptionsDiwu));
+        // })
+        //方向光源
+        let fangxianglist = [
+            [[120.65093459762076, 28.02004337622834, 7.6],
+                [120.65092431147094, 28.020039570384583, 7.6]],
+        ];
+        let fangxianglightoption = {
+            color: new SuperMap3D.Color(4.9, 4.8, 5.2, 1),
+            intensity: 0.6
+            // angle: Math.PI/2
+        };
+        fangxianglist.forEach(coord => {
+            scene.addLightSource(new SuperMap3D.DirectionalLight(
+                SuperMap3D.Cartesian3.fromDegrees(coord[1][0], coord[1][1], coord[1][2]),
+                {
+                    targetPosition: SuperMap3D.Cartesian3.fromDegrees(coord[0][0], coord[0][1], coord[0][2]),
+                    color: fangxianglightoption.color,
+                    intensity: fangxianglightoption.intensity
+                }))
+            scene.addLightSource(new SuperMap3D.DirectionalLight(
+                SuperMap3D.Cartesian3.fromDegrees(coord[0][0], coord[0][1], coord[0][2]),
+                {
+                    targetPosition: SuperMap3D.Cartesian3.fromDegrees(coord[1][0], coord[1][1], coord[1][2]),
+                    color: fangxianglightoption.color,
+                    intensity: fangxianglightoption.intensity
+                }))
+        })
+        //主要地物光源 聚光灯
+        let diwupositions = [
+            //带草坪的操场
+            {
+                color:new SuperMap3D.Color(2, 1.8, 2.2, 1),
+                coord: [120.65088854625006, 28.020406789112354, 4.700451095033025],
+                addheight: 50,
+                distance: 300,
+                decay: 5,
+                intensity: 4,
+                angle: Math.PI / 2
+            },
+            //大广场 周围有马路环绕
+            {
+                color:new SuperMap3D.Color(2, 1.8, 2.2, 1),
+                coord: [120.65272477889668, 28.019484377059637, 5.483758927255444],
+                addheight: 50,
+                distance: 300,
+                decay: 5,
+                intensity: 3,
+                angle: Math.PI / 2
+            },
+            //带红旗的小操场
+            {
+                color:new SuperMap3D.Color(2, 1.8, 2.2, 1),
+                coord: [120.6511996509413, 28.018508468089124, 5.284082217083485],
+                addheight: 20,
+                distance: 70,
+                decay: 5,
+                intensity: 2,
+                angle: Math.PI / 2
+            },
+            //大广场旁边的教学楼
+            {
+                coord: [120.65199758701432,28.019459973310127,26],
+                srccoord:[120.65199754171815,28.01920979649188,12.014080110931497],
+                color:new SuperMap3D.Color(3.4, 3.5, 4.2, 1),
+                distance: 30,
+                decay: 1.6,
+                intensity: 20,
+
+            },
+            //角落里的红色房子
+            {
+                color:new SuperMap3D.Color(2, 1.8, 2.0, 1),
+                coord: [120.65239656702487,28.018213057211216,7.981409320397292],
+                addheight: 16,
+                distance: 60,
+                decay: 5,
+                intensity: 2,
+                angle: Math.PI / 2
+            },
+            //一排平房
+            {
+                color:new SuperMap3D.Color(2, 1.8, 2.0, 1),
+                coord: [120.65080964840645,28.020964280535782,5.67547066798807],
+                addheight: 16,
+                distance: 30,
+                decay: 5,
+                intensity: 2,
+                angle: Math.PI / 2
+            },
+            //操场旁边教学楼
+            {
+                color:new SuperMap3D.Color(2, 1.8, 2.0, 1),
+                coord: [120.65108736240869,28.02007236933198,15.41078248814561],
+                srccoord:[120.65108492022641,28.019543779236013,13.60765030604283],
+                distance: 40,
+                decay: 4,
+                intensity: 20,
+            },
+            // //操场旁边教学楼
+            // {
+            //     color:new SuperMap3D.Color(20, 18, 20, 1),
+            //     coord: [120.65108251572997,28.020071705137845,14.672519686109707],
+            //     srccoord:[120.65108542995172,28.020111047248125,14.744714272798391],
+            //     distance: 10,
+            //     decay: 0.4,
+            //     intensity: 40,
+            // },
+
+        ]
+        let spotLightOtionsdiwu = {
+            color: new SuperMap3D.Color(2, 1.8, 2.2, 1),
+            distance: 300,
+            decay: 5,
+            intensity: 2,
+            angle: Math.PI / 2
+        };
+        diwupositions.forEach(setting => {
+            if(setting.srccoord==null){
+                scene.addLightSource(new SuperMap3D.SpotLight(
+                    SuperMap3D.Cartesian3.fromDegrees(setting.coord[0], setting.coord[1], setting.coord[2] + setting.addheight),
+                    SuperMap3D.Cartesian3.fromDegrees(setting.coord[0], setting.coord[1], setting.coord[2]),
+                    {
+                        color: setting.color,
+                        distance: setting.distance,
+                        decay: setting.decay,
+                        intensity: setting.intensity,
+                        angle: setting.angle
+                    }));
+            }
+            else{
+                scene.addLightSource(new SuperMap3D.SpotLight(
+                    SuperMap3D.Cartesian3.fromDegrees(setting.srccoord[0], setting.srccoord[1], setting.srccoord[2]),
+                    SuperMap3D.Cartesian3.fromDegrees(setting.coord[0], setting.coord[1], setting.coord[2]),
+                    {
+                        color: setting.color,
+                        distance: setting.distance,
+                        decay: setting.decay,
+                        intensity: setting.intensity,
+                    }));
+            }
+        })
+
+        //路灯光源
+        // {longitude: 120.65140104276037, latitude: 28.018518724036927, height: 12.250015970433747}
+        let ludengpositions = [
+            [120.65140104276037, 28.018518724036927, 12.25],
+            [120.6514196105656, 28.01842504099596, 12.110237881439101],
+            // [120.65138245161342,28.01863423489283,12.181528012903497],
+            [120.65138739738974, 28.018747308634552, 12.262759923383872],
+            [120.65122561073846, 28.018726616042052, 12.247365500258052],
+            // [120.6510582398394,28.018710253094778,12.185458116952217],
+            [120.65157676907127, 28.01877219895327, 12.140945570007265],
+            // [120.65168185679302,28.018949925311187,12.163813926059241],
+            [120.65167305368038, 28.01907256010044, 12.281589997427192],
+            [120.65134406541678, 28.018905106846702, 12.199580652795833],
+            // [120.65132171605576,28.019023720602263,12.150181266743346],
+            [120.65127050929017, 28.01889110684336, 12.149681491521434],
+            [120.65124756789052, 28.019026248286533, 12.275240811982732],
+            // [120.65109479864746,28.018963394332115,12.146106095042589],
+            [120.65100872699092, 28.01884818524103, 12.256671108362625],
+            // [120.65098705343239,28.018995255092307,12.257621593961664],
+            [120.65096361527722, 28.0191481635103, 12.17963550716965],
+            // [120.65121698059465,28.019210524181066,12.285752615646937],
+            // [120.65129493832836,28.019168792784132,12.283251443196903],
+            [120.651277691991, 28.019273412243546, 12.286305739042897],
+            // [120.65120212788821,28.019307981701584,12.263574007896011],
+            [120.6512617301288, 28.019397736767818, 12.190119231836434],
+            [120.65118578718796, 28.01941501566331, 12.235471230586635],
+            // [120.65113034253395,28.019464450856365,12.163219735396105],
+            // [120.65098294044294, 28.019452190285246, 12.206954855080115],
+            [120.6509406877187, 28.019260603630666, 12.191686755752512],
+            // [120.65096886732336,28.019591247811334,12.15965990242011],
+            [120.65093681523312, 28.019686983561034, 12.217962452163837],
+            // [120.65110673253594,28.01960828163436,12.280367841065726],
+            [120.65116722781376, 28.019732018169524, 12.253742867052669],
+            // [120.65122663895546,28.019586987716096,12.263927301304733],
+            [120.65133812234833, 28.019637363794587, 12.182471708228613],
+            // [120.65131862201874, 28.01975128663351, 12.246355969403684],
+            [120.65144211010707, 28.019739317208497, 12.236435715068941],
+            // [120.65157682006058,28.01976480560433,12.280074919438835],
+            [120.65159997286065, 28.0195771141478, 12.221177694002092],
+            [120.65161419217776, 28.019464015415625, 12.214539019361522],
+            // [120.65170177667329,28.019832959698725,12.18898513002371],
+            [120.6518558958963, 28.01985457955431, 12.26118114473618],
+            // SuperMap3D.Cartesian3.fromDegrees(120.65140104276037, 28.018518724036927, 12.25),
+
+
+        ];
+        //主干道灯
+        let ludengposition2 = [
+            [120.65064221088741, 28.017935441473718, 12.548572797108177],
+            [120.6508909069755, 28.017962467176677, 12.550178078027704],
+            [120.65100833052466, 28.01796910909952, 12.517270256271333],
+            [120.65146623997788, 28.01798897371463, 12.533695883991822],
+            [120.65189575382817, 28.017981453636217, 12.50656843621294],
+            [120.6523966307352, 28.018037373444315, 12.549003267908242],
+            [120.65268168239942, 28.018197543192432, 12.504044322976535],
+            [120.6526413716114, 28.01854756307994, 12.429903081233093],
+            [120.6526134191711, 28.018765091894792, 12.51769254465235],
+            [120.65251387724888, 28.0189840385991, 12.533506965156626],
+            [120.65251894828279, 28.0193068323797, 14.629904954887717],
+            [120.65233691886984, 28.01957408345315, 12.549494145785182],
+            [120.65247452061259, 28.019795432455386, 14.581182084082025],
+            [120.6526853386442, 28.02011133666016, 12.55988298290776],
+            [120.65290452896915, 28.019754239544078, 14.449782179331665],
+            [120.65295570723922, 28.019361900922163, 14.515243136641319],
+            [120.65260781324153, 28.02086153722392, 12.565102110676824],
+            [120.65253102419324, 28.021104511909787, 12.516398189248205],
+            [120.652510406809, 28.021208861875888, 12.505889733476987],
+            [120.6524493212896, 28.02141626372384, 12.549713756404037]
+        ]
+        let spotLightOtionsludeng = {
+            color: new SuperMap3D.Color(1.1, 1, 1.2, 1),
+            distance: 16,
+            decay: 3,
+            intensity: 20,
+            angle: Math.PI / 2
+        };
+        let spotLightOtionsludeng2 = {
+            color: new SuperMap3D.Color(2, 1.8, 2.2, 1),
+            distance: 23,
+            decay: 5,
+            intensity: 22,
+            angle: Math.PI / 2
+        };
+        let pointlightludengoption = {
+            cutoffDistance: 5.0,
+            color: new SuperMap3D.Color(10, 9, 11, 1.0),
+            intensity: 1.12,
+        }
+        ludengpositions.forEach(coord => {
+            // scene.addLightSource(new SuperMap3D.SpotLight(
+            //     SuperMap3D.Cartesian3.fromDegrees(coord[0],coord[1],coord[2]+12),
+            //     SuperMap3D.Cartesian3.fromDegrees(coord[0],coord[1],coord[2]),
+            //     spotLightOtionsludeng));
+            scene.addLightSource(new SuperMap3D.SpotLight(
+                SuperMap3D.Cartesian3.fromDegrees(coord[0],coord[1],coord[2]),
+                SuperMap3D.Cartesian3.fromDegrees(coord[0],coord[1],0),
+                spotLightOtionsludeng));
+            scene.addLightSource(new SuperMap3D.PointLight(SuperMap3D.Cartesian3.fromDegrees(coord[0],coord[1],coord[2]), pointlightludengoption));
+        })
+        ludengposition2.forEach(coord => {
+            scene.addLightSource(new SuperMap3D.SpotLight(
+                SuperMap3D.Cartesian3.fromDegrees(coord[0],coord[1],coord[2]),
+                SuperMap3D.Cartesian3.fromDegrees(coord[0],coord[1],0),
+                spotLightOtionsludeng2));
+        })
+
+
+    }
+
+    if (typeof SuperMap3D !== 'undefined') {
+        window.startupCalled = true;
+        onload(SuperMap3D);
+    }
+</script>
+</body>
+</html>

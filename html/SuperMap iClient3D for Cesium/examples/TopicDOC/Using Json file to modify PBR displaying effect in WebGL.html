@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <title>WebGL中利用Json文件设置模型PBR材质的显示效果</title>
+    <link rel="shortcut icon" type="image/x-icon" href="../../web/img/favicon.ico"/>
+    <script type="text/javascript" include="jquery,bootstrap,template,admin-lte,jquery.scrollto,lazyload"
+            src="../js/include-web.js" from="doc"></script>
+    <link rel="stylesheet" href="../css/common.css"/>
+    <link rel="stylesheet" href="../css/examples.css"/>
+    <link rel="stylesheet" href="../css/header.css"/>
+    <link rel='stylesheet' href='../css/sm-extend.css'/>
+    <link rel='stylesheet' href='../css/sm-doc.css'/>
+
+    <style type="text/css">
+        <!--
+        .STYLE2 {
+            font-weight: bold
+        }
+
+        .STYLE3 {
+            font-family: Arial, Helvetica, sans-serif
+        }
+
+        -->
+    </style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini" data-spy="scroll" data-target="#scrollSpy">
+<!-- ./wrapper -->
+
+<header class="header-wrapper main-header icl-header"></header>
+<script>
+    var navigation = {
+        nav: {
+            title: 'SuperMap iClient3D for WebGL',
+            path: '../../web/',
+            isLocal: window.isLocal
+        }
+    };
+    identification = {};
+    utils.loadTemplate('.icl-header', '../template/header.html', navigation);
+</script>
+
+
+<div class="wrapper"></div>
+<div id='container' class='container' style="width: 90%; padding-top: 75px;">
+    <div class='page-header'>
+        <h1>利用Json文件设置模型PBR材质的显示效果</h1>
+        <hr/>
+        <h2 class="title">背景需求<a name="Summary"> </a></h2>
+
+        <p>模型显示效果优化。</p>
+
+        <h2 class="title">方法介绍</h2>
+        <p >目前有两种方式设置模型的PBR效果：</p>
+		<ul>
+            <ul class="disc">
+                <li>①通过指定图层，给相应图层的模型对象设置统一的PBR效果；</li>
+                <li>②通过专题图的方式，给相同属性的对象设置统一的PBR效果；</li>
+            </ul>
+        </ul>
+        <h3><a name="01PrepareData"></a>1.通过图层设置模型的PBR效果</h3>
+
+        <p>该方法适用于图层中的对象具有相同材质的情况。</p>
+
+        <p><strong>1.</strong><strong>1 </strong><strong>根据对象的材质类型，进行图层的划分</strong></p>
+
+        <p>在该数据中，主要分为两种类型：</p>
+        <ul>
+            <ul class="disc">
+                <li>①厂房的外壳，地面等对象，这些对象使用的是普通的材质，不需要设置额外的PBR效果；</li>
+                <li>②厂房内部的机械设备，包括机床，栏杆等，这些对象都是金属材质的，需要统一设置金属效果；</li>
+            </ul>
+        </ul>
+        <p>图层的划分可以在3ds Max导出的时候分开导出，也可以导出之后，在SuperMap iDesktop中根据属性拆分。 </p>
+
+        <p><strong>1</strong><strong>.2</strong><strong> </strong><strong>制作外挂的Json文件</strong><strong> </strong></p>
+
+        <p>目前Json文件的获取可以通过游戏引擎的插件进行导出，也可以通过直接修改Json文件的方式，来调整数据的效果。 <br>
+            在3ds Max中，查看数据的材质参数，所有金属对象的粗糙度均为0，金属度均为0.8，因此在Json文件中，设置"roughnessFactor": 0.01，"metallicFactor":
+            0.8，其余参数保持不变。粗糙度的值等于0的时候，会没有PBR的效果，所以需要设置大于0，这里设置为0.01。 </p>
+
+        <div class="pageImage"><img src="../images/TopicDOC/PBR1.png"><br>
+
+            <p>图1</p>
+        </div>
+        <div class="pageImage"><img src="../images/TopicDOC/PBR2.png"><br>
+
+            <p>图2</p>
+        </div>
+        <div class="pageImage"><img src="../images/TopicDOC/PBR3.png" width="549"><br>
+
+            <p>图3</p>
+      </div>
+        <p><strong>1.3 前端设置图层的PBR材质 </strong></p>
+
+        <p>首先找到需要设置PBR材质的图层，然后外挂制作好的Json文件。</p>
+				<pre>
+                    var layer = scene.layers.find("ReComputeNormalResult");
+                       //添加pbr
+                    layer.setPBRMaterialFromJSON("./data/pbr/GD.json");
+                </pre>
+        <p>最终效果如下： </p>
+
+        <div class="pageImage"><img src="../images/TopicDOC/PBR4.png"><br>
+
+            <p>图4</p>
+        </div>
+        <h3><a name="02Monomer"></a>2. 通过属性专题图设置模型的PBR效果</h3>
+
+        <p>该方法适用于图层中的对象可以按照属性进行材质划分的情况。 <br>
+            例如下图中的数据，只有一个图层，红色的绝缘子为陶瓷，橙黄色的吊弦为黄铜，其余的对象为铝材质。 </p>
+
+        <div class="pageImage"><img src="../images/TopicDOC/PBR5.png"><br>
+
+            <p>图5</p>
+        </div>
+        <div class="pageImage"><img src="../images/TopicDOC/PBR6.png"><br>
+
+            <p>图6</p>
+        </div>
+        <p><strong>2.1根据对象的材质类型，进行图层的划分质 </strong></p>
+
+        <p>通过观察该模型数据集的属性发现：可以通过 “层”属性进行材质类型的区分。</p>
+
+        <p>一般BIM类的数据，都会有对应的属性进行区分。</p>
+
+        <div class="pageImage"><img src="../images/TopicDOC/PBR7.png"><br>
+
+            <p>图7</p>
+        </div>
+        <p><strong>2.2制作外挂的Json文件 </strong></p>
+
+        <p>目前Json文件的获取可以通过游戏引擎的插件进行导出，也可以通过直接修改Json文件的方式，来调整数据的效果。</p>
+
+        <p>陶瓷Ceramic的材质："roughnessFactor": 0.2，"metallicFactor": 0.0；铝Aluminum的材质："roughnessFactor":
+            0.5，"metallicFactor": 1.0。</p>
+
+        <div class="pageImage"><img src="../images/TopicDOC/PBR8.png" width="487"><br>
+
+            <p>图8</p>
+      </div>
+        <div class="pageImage"><img src="../images/TopicDOC/PBR9.png" width="606"><br>
+
+            <p>图9</p>
+      </div>
+        <p><strong>2.3前端设置属性专题图的PBR材质 </strong></p>
+
+        <p>根据“层”属性中的值，依次外挂不同材质的Json文件。</p>
+
+        <p>主要使用的接口为layer.themeStyle = colorByID();</p>
+
+        <p>参考代码：</p>
+        <pre>
+            var scene = viewer.scene;
+              var urls = [
+             './data/pbr/tielu/Ceramic.json',
+             './data/pbr/tielu/Bronze.json',
+             './data/pbr/tielu/Aluminum.json',
+             ];
+              scene.parsePBRFromJson(urls);
+              var canvas = scene.canvas;
+              var widget = viewer.cesiumWidget;
+              $('#loadingbar').remove();
+            try {
+              //添加S3M图层服务
+              var promise = scene.open('http://localhost:8090/iserver/services/3D-text/rest/realspace');
+              Cesium.when(promise, function (layers) {
+            var layer = scene.layers.find('guidao_qiu');
+               var conditions = [];
+                 conditions.push(['${层} === "绝缘子"', 0]);
+                 conditions.push(['${层} === "吊弦"', 1]);
+                 //先使用前面的设置，剩余的数据，使用2对应的Json文件
+                 conditions.push(['${id} >= 0', 2]);
+                 layer.themeStyle = colorByID();
+               function colorByID() {
+                var cesiumStyle = new Cesium.Cesium3DTileStyle({
+                    pbrMaterialIndex : {
+                        conditions: conditions
+                    }
+                });
+                  return cesiumStyle;
+            }
+        </pre>
+        <h4>最终效果如下：</h4>
+		<div class="pageImage"><img src="../images/TopicDOC/PBR10.png"><br>
+
+            <p>图10</p>
+        </div>
+		<div class="pageImage"><img src="../images/TopicDOC/PBR11.png"><br>
+
+            <p>图11</p>
+        </div>
+    </div>
+</div>
+<!--法律申明-->
+<div style="background-color: #1c1c1c;color: rgba(222,222,222,0.71)" class="icl-copyright" data-i18n="footer.copyright">
+    版权所有 © 2000-2022 北京超图软件股份有限公司 京ICP备11032883号-8
+    京公网安备11010502008721 甲测资字11002074
+</div>
+<!--footer end-->
+<script type="text/javascript" src="../js/utils.js"></script>
+</body>
+</html>

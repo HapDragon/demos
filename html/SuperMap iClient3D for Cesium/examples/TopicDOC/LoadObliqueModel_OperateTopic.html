@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+		<title>加载倾斜摄影模型操作手册</title>
+		<link rel="shortcut icon" type="image/x-icon" href="../../web/img/favicon.ico"/>
+		<script type="text/javascript" include="jquery,bootstrap,template,admin-lte,jquery.scrollto,lazyload"
+				src="../js/include-web.js" from="doc"></script>
+		<link rel="stylesheet" href="../css/common.css"/>
+		<link rel="stylesheet" href="../css/header.css"/>
+		<link rel="stylesheet" href="../css/examples.css"/>
+		<link rel='stylesheet' href='../css/sm-extend.css'/>
+		<link rel='stylesheet' href='../css/sm-doc.css'/>
+	</head>
+	<body class="hold-transition skin-blue sidebar-mini" data-spy="scroll" data-target="#scrollSpy">
+	<!-- ./wrapper -->
+
+	<header class="header-wrapper main-header icl-header"></header>
+	<script>
+        var navigation = {
+            nav: {
+                title: 'SuperMap iClient3D for WebGL',
+                path: '../../web/',
+                isLocal: window.isLocal
+            }
+        };
+        identification = {};
+        utils.loadTemplate('.icl-header', '../template/header.html', navigation);
+	</script>
+		<!-- ./wrapper -->
+		<div class="wrapper"></div>
+		<div id='container' class='container' style="width: 90%; padding-top: 75px;">
+			<div class='page-header'>
+				<h1>加载倾斜摄影模型操作手册</h1>
+				<hr/>
+				<h2 class="title">概述<a name="Summary"> </a></h2>
+				<p>倾斜摄影模型能够全方位、全要素地展示现实物理世界，因其高精度、高效率、高真实感和低成本的绝对优势成为了三维GIS的重要数据来源。SuperMap GIS 全系列产品支持倾斜摄影模型，并且为了优化模型在网络环境中的传输和解析，SuperMap iClient3D for WebGL(以下简称WebGL客户端)采用三维切片缓存（*.S3MB）格式存储与发布模型数据，提高了WebGL客户端浏览倾斜摄影模型的性能和效率。 </p>
+				<p>本文档主要阐述了WebGL客户端实现浏览倾斜摄影模型数据的详细操作流程，其主要操作过程有以下： </p>
+				<ol>
+					<ol class="list">
+						<li><a class="local" href="#01CreatSCP">生成配置文件</a></li>
+						<li><a class="local" href="#02CreatS3M">倾斜入库</a></li>
+						<li><a class="local" href="#03Publish3DService">发布三维服务</a></li>
+						<li><a class="local" href="#04BrowseOblique">客户端浏览倾斜摄影模型</a></li>
+					</ol>
+				</ol>
+				<h2 class="title">操作流程<a name="OperationFlow"></a></h2>
+				<p>下面将以示例数据MaSai作详细操作演示。 </p>
+				<h3><a name="01CreatSCP"></a>1.生成配置文件</h3>
+				<h4>操作说明</h4>
+				<br>
+				<p>“<strong>生成配置文件</strong>”功能可为存放在多个文件夹的多个*.osgb 格式的原始倾斜摄影模型生成<strong>一个 *.scp 格式的模型配置文件</strong>，它记录了倾斜摄影模型文件的相对路径、名称、插入点位置及坐标系信息等内容。 </p>
+				<p>假如您已经拥有了*.scp格式的配置文件，可跳过此步骤直接进行<a href="#02CreatS3M">2.倾斜入库</a>。 </p>
+				<h4>操作步骤</h4><br>
+				<p>(1).在SuperMap iDesktop桌面产品的“<strong>三维数据</strong>”选项卡中单击倾斜摄影组中“<strong>数据管理</strong>”工具；展开功能列表后，单击“<strong>生成配置文件</strong>”按钮，如下图所示。</p>
+				<div class="pageImage"><img src="../images/TopicDOC/LoadOblique_ClickCreatSCP.jpg" width="447" height="137">
+					<p>图 1   点击“生成配置文件”工具</p>
+				</div>
+				<p>(2).弹出“<strong>生成倾斜摄影配置文件</strong>”对话框，如下图所示。 </p>
+				<div class="pageImage"><img src="../images/TopicDOC/LoadOblique_CreatSCPDialog.jpg" width="624" height="339"><br>
+					<p>图 2   “生成倾斜摄影配置文件”对话框</p>
+				</div>
+				<p>(3).在对话框的“<strong>源数据</strong>”处，设置以下：</p>
+				
+				<ul>
+					<ul class="disc">
+						<li><strong>源路径</strong>：单击右侧文件浏览按钮，在弹出的“浏览文件夹”对话框中选择 OSGB 数据所在文件夹，或者在文本框中直接输入 OSGB 数据所在的文件夹路径。</li>
+						<li><strong>指定根节点</strong>：支持设置指定根节点。单击“指定根节点”按钮，弹出“指定根节点”对话框，显示文件路径，可以删除和增加根节点文件。系统会自动读取文件夹路径下所有根节点数据，如下图： </li>
+						<div class="pageImage"><img src="../images/TopicDOC/LoadOblique_Specify_the_root_node.jpg" width="624" height="339"><br>
+						<p>图 3   “指定根节点”对话框</p>
+						</div>
+						<li><strong>元数据</strong>：一个*.xml文件，文件里存储有数据的EPSG编码、插入点等信息。在此打开元数据，桌面会自动读取插入点和坐标系信息。 </li>
+					</ul>
+				</ul>
+				
+				<p>(4). 在对话框的“<strong>结果设置</strong>”处，设置以下：</p>
+				
+				<ul>
+					<ul class="disc">
+						<li><strong>目标路径</strong>：选择 *.scp 文件保存路径。 </li>
+						<li><strong>目标文件名</strong>：输入 *.scp文件名称。默认名称为“config”。 </li>
+					</ul>
+				</ul>
+
+				<p>(5).在对话框的“<strong>模型参考点</strong>”处设置X、Y、Z值。默认的模型参考点为（0,0,0）。 </p>
+				<ul>
+					<ul class="disc">
+						<li>“<strong>模型参考点</strong>”是指倾斜摄影模型的中心点位置，X代表经度，Y代表纬度，Z代表高程。</li>
+					</ul>
+				</ul>
+				<p>(6).如果倾斜摄影模型是ENU坐标系，勾选“ENU”。否则勾选“投影设置”，设置 *.scp 文件的投影信息，目前提供两种方式：</p>
+				
+				<ul>
+					<ul class="disc">						
+						<li><strong>投影设置</strong>：当选择“投影设置”单选框，单击右侧“设置...”按钮，弹出“坐标系设置”对话框，选择一种投影作为目标文件的坐标系。</li>
+						<li><strong>导入投影文件</strong>：当选择“导入投影文件”单选框，单击右侧文件浏览图标按钮，在弹出的“选择”窗口中，选择投影信息文件并导入即可。同时，下方文本框中会显示所选投影文件的坐标系详细信息。 </li>
+					</ul>
+				</ul>
+				<p>(7).如果倾斜摄影模型需要进行坐标转换，勾选“坐标转换参数设置”复选框，设置目标坐标系和参照系转换设置。参数设置具体如下：</p>
+				
+				<ul>
+					<ul class="disc">
+						<li><strong>目标坐标系</strong>：设置坐标转换的目标坐标系，操作过程与“投影设置”一致，可参考步骤(6)。 
+ </li>
+						<li><strong>参照系转换设置</strong>：设置转换方法和投影转换参数，其中“转换方法”通过单击右侧下拉箭头按钮进行选择，目前提供11种转换方法，分别是：Geocentric Translation(3-para)、Molodensky(3-para)、Abridged Molodensky(3-para)、Position Vector(7-para)、Coordinate Frame(7-para)、用户自定义、Bursa-wolf(7-para)、MolodenskyBadekas(10-para)、China_3D_7P(7-para)、China_2D_4P(4-para)、PROJ4 Transmethod。对于投影转换参数，单击“设置”按钮，弹出“投影转换”对话框，如下图所示，可进行详细参数设置。  </li>
+						<div class="pageImage"><img src="../images/TopicDOC/LoadOblique_projection_transformation.jpg" width="599" height="279"><br>
+						<p>图 4   “投影转换”对话框</p>
+						</div>
+					</ul>
+				</ul>
+				
+				<p>(8).设置完以上参数后，单击“<strong>确定</strong>”按钮，即可执行生成配置文件操作。 </p>
+				<h4>操作结果</h4><br>
+				<p align="left">操作完成后，目标路径下产生了一个*.scp的文件，如下图：</p>
+
+				<div class="pageImage"><img src="../images/TopicDOC/LoadOblique_CreatSCPResult.png" width="599" height="279"><br>
+					<p>图 5   生成配置文件结果</p>
+				</div>
+				<h3><a name="02CreatS3M"></a>2. 倾斜入库</h3>
+				<h4>操作说明</h4>
+				<br>
+				<p>上一步骤所生成的*scp配置文件记录了倾斜模型文件的相对路径、名称等信息，“倾斜入库”功能支持倾斜摄影数据进行合并根节点、纹理压缩、模型单体化以及修改模型中心点等操作，实现批量处理倾斜摄影模型，可实现倾斜算子一体化处理，支持多线程。</p>
+				<h4>操作步骤</h4><br>
+				<p>(1).打开SuperMap iDesktop，在“<strong>三维数据</strong>”选项卡“<strong>倾斜摄影</strong>”分组中点击“<strong>数据处理</strong>”工具；展开功能列表后，单击“<strong>倾斜入库</strong>”按钮，如下图所示。</p>
+				<div class="pageImage"><img src="../images/TopicDOC/LoadOblique_Put_in_Storage.png" width="564" height="141"><br>
+					<p>图 6   点击“倾斜入库”工具</p>
+				</div>
+				<p>(2).弹出“<strong>倾斜入库</strong>”对话框，如下图所示。 </p>
+				<div class="pageImage"><img src="../images/TopicDOC/LoadOblique_Put_in_StorageDialog.png" width="396" height="158"><br>
+					<p>图 7   “倾斜入库”对话框</p>
+				</div>
+				<p>(3).在对话框的“<strong>源配置文件</strong>”处,单击“<strong>添加scp配置文件</strong>”，在弹出的“<strong>打开</strong>”对话框中，选择 *.scp 文件，或者通过单击“<strong>打开文件夹下所有scp文件</strong>”按钮，添加源配置文件。 </p>
+				<p>(4).在对话框的“<strong>参数设置</strong>”处，参数设置如下说明： </p>
+				
+				<ul>
+					<ul class="disc">
+						<li><strong>输出目录</strong>：设置结果数据存放路径。 </li>
+						<li><strong>保存类型</strong>：设置结果数据的数据类型，包括S3MB。 </li>
+						<li><strong>线程数</strong>：设置倾斜入库操作的线程数，默认为8。 </li>
+						<li><strong>存储类型</strong>：分为原始和紧凑两种存储类型，默认使用原始的存储类型。紧凑的存储类型，会将每个Tile文件夹下的碎文件生成为一个文件。 </li>
+						<li><strong>几何压缩方式</strong>：目前提供三种压缩方式，不压缩、常规压缩和DRACO压缩。 </li>
+						<li><strong>纹理压缩</strong>：默认DXT（PC设备）压缩方式。目前支持五种压缩类型：WebP、DXT（PC设备）、CRN_DXT5（PC设备）、PVRTC（iOS系列设备）、ETC（Android系列设备）、不压缩。对于不同用途的数据，采用不同的纹理压缩方式，可以减少纹理图像所使用的显存数量。
+						<ul>
+							<ul class="disc">
+								<li><strong>不压缩</strong>：默认的纹理格式。 </li>
+								<li><strong>WebP</strong>：适用于 Web端/PC机上通用的压缩纹理格式。数据总量减少，提高传输性能。</li>
+								<li><strong>DXT（PC设备）</strong>：适用于 PC 机（个人计算机）上通用的压缩纹理格式。显存占用减少，提升渲染性能，但是数据总量会增加。 </li>
+								<li><strong>CRN_DXT5（PC设备）</strong>：适用于 PC 机（个人计算机）上通用的压缩纹理格式，显存占用少许减少，数据总量大幅度减少，但是需要较长的处理时间。 </li>
+								<li><strong>PVRTC（iOS系列设备）</strong>：适用于苹果 iOS 设备上通用的压缩纹理格式。以此种方式进行纹理压缩时，同时会生成一个离线地图包，方便 iOS 设备用户使用。 </li>
+								<li><strong>ETC（Android系列设备）</strong>：适用于 Android 设备上通用的压缩纹理格式。以此种方式进行纹理压缩时，同时会生成一个离线地图包，方便 Android 设备用户使用。 </li>
+							</ul>
+						</ul>
+						</li>
+						<li><strong>纹理重映射</strong>：用于解决部分倾斜数据中纹理拼接不合理的情况，提升性能。默认不勾选。 </li>
+					</ul>
+				</ul>
+				
+				<p>(5).在对话框的“<strong>修改中心点</strong>”：可选，勾选“修改中心点”后，设置模型中心点X、Y、Z坐标值。</p>
+				
+				<ul>
+					<ul class="disc">
+						<li>倾斜摄影模型的坐标由配置文件（*.SCP）的标签和数据本身的坐标信息决定，加载同一测区的多份数据时，由于每份数据都有一个自己的中心点坐标，因此需要分别加载多个SCP配置文件。“修改模型中心点”通过修改数据本身的坐标信息，用于解决同一测区的倾斜摄影数据多个中心点的问题，实现一个SCP配置文件加载所有数据的要求，不仅如此还支持多个模型批量修改中心点。</li>
+					</ul>
+				</ul>
+				
+				<p>(6).在对话框的“<strong>合并根节点</strong>”：可选，勾选“合并根节点”后，设置金字塔层级。金字塔层级是用于设置根节点合并次数，默认值为1，即模型根节点将进行一次合并处理。详细信息请参见<strong>SuperMap iDesktop 10i Help.chm</strong>里的"<strong>合并根节点</strong>"。 </p>
+				<p>(7).在对话框的“<strong>模型单体化</strong>”:可选，勾选“模型单体化”后，设置叠加到模型上的矢量面所在的数据源、数据集和目标字段。详细信息请参见<strong>SuperMap iDesktop 10i Help.chm</strong>里的"<strong>压缩并单体化</strong>"。</p>
+				<p>(8).投影设置目前提供两种方式：</p>
+				
+				<ul>
+					<ul class="disc">
+						<li><strong>投影设置</strong>：获取或设置数据的原始坐标系。当选择“投影设置”单选框，单击右侧“设置...”按钮，弹出“坐标系设置”对话框，选择一种投影作为目标文件的坐标系。设置目标投影的具体操作，请参考<strong>SuperMap iDesktop 10i Help.chm</strong>里的"<strong>投影设置</strong>"。 </li>
+						<li><strong>导入投影文件</strong>：当选择“导入投影文件”单选框，单击右侧文件浏览图标按钮，在弹出的“选择”窗口中，选择投影信息文件并导入即可。同时，下方文本框中会显示所选投影文件的坐标系详细信息。 </li>
+					</ul>
+				</ul>
+				
+				<p>(9).设置完以上参数后，单击“<strong>确定</strong>”按钮，等待倾斜入库完成。</p>
+				<p>&nbsp;</p>
+				<h4>操作结果</h4><br>
+				<p>“倾斜入库”操作结果如下图-右S3MB所示，此次列举设置不合并根节点，生成了与原始文件结构一致的目标文件夹；分别打开任一模型文件夹，可以看到OSGB格式模型与S3MB格式模型的一一对应关系，如下图。</p>
+				<div class="pageImage"><img src="../images/TopicDOC/LoadOblique_OSGB3S3MResult.png" width="749" height="489"><br>
+					<p>图 8   倾斜入库结果（图右）及模型对应关系</p>
+				</div>
+				<h3><a name="03Publish3DService"></a>3. 发布三维服务</h3>
+				<h4>操作说明</h4>
+				<br>
+				<p>在上一步操作中对倾斜摄影模型进行了倾斜入库操作，接下来将倾斜摄影模型以三维服务的形式发布到本地或远程服务器上，实现Web网络资源共享。 </p>
+				<h4>操作步骤</h4><br>
+				<p>(1). 在SuperMap iDesktop桌面产品的 “<strong>工作空间管理器</strong>”中，在“<strong>场景</strong>”下右键点击“<strong>新建球面场景</strong>”。 </p>
+				<div class="pageImage"><img src="../images/TopicDOC/NewScene.png" width="286" height="280"><br>
+					<p>图 9   新建球面场景</p>
+				</div>
+				<p>(2).“<strong>图层管理器</strong>”下选中“<strong>普通图层</strong>”，右键点击“<strong>添加三维切片缓存图层</strong>”，选择*.scp配置文件。 </p>
+				<div class="pageImage"><img src="../images/TopicDOC/AddOSGBLayer.png" width="280" height="247"><br>
+					<p>图 10   向场景添加三维切片缓存</p>
+				</div>
+				<p>(3).加载数据后，直接保存场景和工作空间。 </p>
+				<p>(4).保存工作空间后，在 <strong>%SuperMap iServer_HOME%/bin </strong>目录下，点击“<strong>startup.bat</strong>“批处理文件，启动SuperMap iServer服务。 </p>
+				<p>(5).打开浏览器，地址栏输入<a href="http://localhost:8090/iserver/manager">http://localhost:8090/iserver/manager</a> 进入“<strong>服务管理“</strong>页面，“<strong>首页</strong>”下点击“<strong>快速发布一个或一组服务</strong>“按钮。 </p>
+				<div class="pageImage"><img src="../images/TopicDOC/PublishQuickly.png" width="393" height="362"><br>
+					<p>图 11   快速发布一个或一组服务</p>
+				</div>
+				<p>(6).弹出“<strong>快速发布服务</strong><strong>-选择发布的数据来源</strong>”对话框，在”<strong>数据来源</strong>“处选择”<strong>工作空间</strong>“，点击”<strong>下一步</strong>“。</p>
+				<div class="pageImage"><img src="../images/TopicDOC/DataSource.png" width="509" height="231"><br>
+					<p>图 12   数据来源选择工作空间</p>
+				</div>
+				<p>(7).弹出“<strong>快速发布服务</strong><strong>-</strong><strong>配置数据</strong>“对话框，点击”<strong>远程浏览</strong>“按钮选择前述所保存的工作空间，点击”<strong>下一步</strong>“。 </p>
+				<div class="pageImage"><img src="../images/TopicDOC/LoadOblique_SelectWorkspace.png" width="723" height="277"><br>
+					<p>图 13   选择工作空间配置数据</p>
+				</div>
+				<p>(8).弹出“<strong>快速发布服务</strong><strong>-</strong><strong>选择发布的服务类型</strong>“对话框，勾选”<strong>REST-</strong><strong>三维服务</strong>“，点击”<strong>下一步</strong>“。 </p>
+				<div class="pageImage"><img src="../images/TopicDOC/Select3DService.png" width="516" height="269"><br>
+					<p>图 14   勾选三维服务</p>
+				</div>
+				<p>至此，服务发布已配置完成，按照提示点击“完成“和”关闭“按钮。</p>
+				<h4>操作结果</h4><br>
+				<p>服务发布完成后，将在服务列表中显示该三维服务，如下图所示。</p>
+				<div class="pageImage"><img src="../images/TopicDOC/LoadOblique_PublishServiceResult.png" width="685" height="343"><br>
+					<p>图 15   三维服务下显示新发布的服务</p>
+				</div>
+				<h3><a name="04BrowseOblique"></a>4. 客户端浏览倾斜摄影模型</h3>
+				<h4>操作说明</h4><br>
+				<p>发布了三维服务以后，在此步骤中便可通过WebGL客户端浏览地形数据。</p>
+				<p class="STYLE2">提示：在操作前请将WebGL产品包存放在<strong> %SuperMap iServer_HOME%/webapps</strong> 目录下。</p>
+				<h4>操作步骤</h4><br>
+				<p>(1)	获取三维数据url地址，按照如下顺序点击获取：</p>
+				<ul>
+					<ul class="disc">
+						<li>进入服务列表页面（<a target="_blank" href="http://localhost:8090/iserver/services"><u>http://localhost:8090/iserver/services</u></a>），找到并点击上一步骤所发布的三维服务；</li>
+						<li>进入“<strong>根目录</strong>“页面，点击”<strong>realspace</strong>“；</li>
+						<li>进入”<strong>三维服务根节点</strong><strong>(3D)</strong>“页面，点击“<strong>datas</strong>“；</li>
+						<li>进入”<strong>三维数据列表</strong><strong>(datas)</strong>“页面，点击“<strong>Config</strong>“；</li>
+						<li>进入“<strong>三维数据资源</strong><strong>(data)</strong>“页面，点击”<strong>获取三维数据的配置文件</strong>“，出现如下图所示的页面，复制浏览器地址栏的<strong>url</strong><strong>地址</strong>。 </li>
+					</ul>
+				</ul>
+				<div class="pageImage"><img src="../images/TopicDOC/LoadOblique_CopyConfig.png" width="878" height="129">
+					<p>图 16   复制url地址</p>
+				</div>
+				<p>(2)	进入WebGL产品包存放路径（<strong>%SuperMap iServer_HOME%/webapps</strong>），在“examples”文件夹下，文本方式打开“<strong>S3MTiles.html</strong>“范例，修改如下图的内容。</p>
+
+				<div class="pageImage"><img src="../images/TopicDOC/LoadOblique_ModifySample.png" style="width:80%">
+					<p>图 17   修改范例部分参数</p>
+				</div>
+
+				<ul>
+					<ul class="disc">
+						<li>修改<strong>scene.</strong> <strong>addS3MTilesLayerByScp ()</strong>函数：将地址修改为方才复制的<strong>url</strong><strong>地址</strong>，并更改name。</li>
+						<li>修改<strong>Cesium.Cartesian3.fromDegrees()</strong>函数：它的参数为倾斜摄影模型的中心点位置，分别为经度、纬度和高程。<strong>请更改为</strong><strong>scp</strong><strong>文件中的插入点坐标</strong>，用于飞行定位到倾斜摄影模型位置。</li>
+					</ul>
+				</ul>
+
+				<p>(3)	以localhost方式打开“<strong>S3MTiles</strong>.html “网页，浏览器输入地址即为：<u>http://localhost:8090/%WebGL产品包%/examples/webgl/S3MTiles.html</u></p>
+				<h4>操作结果</h4><br>
+				<p>打开网页后，相机飞至倾斜摄影模型所在位置，显示效果如下图： </p>
+				<div class="pageImage"><img src="../images/TopicDOC/LoadOblique_BrowseResult.jpg"><br>
+					<p>图 18   WebGL浏览倾斜摄影模型效果</p>
+				</div>
+			</div>
+		</div>
+	<!--法律申明-->
+	<div style="background-color: #1c1c1c;color: rgba(222,222,222,0.71)" class="icl-copyright" data-i18n="footer.copyright">版权所有 © 2000-2020 北京超图软件股份有限公司 京ICP备11032883号-8
+		京公网安备11010502008721 甲测资字11002074
+	</div>
+	<!--footer end-->
+		<script type="text/javascript" src="../js/utils.js"></script>
+	</body>
+</html>

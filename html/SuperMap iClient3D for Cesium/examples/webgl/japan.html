@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>旧金山白天场景渲染</title>
+    <link href="./css/widgets.css" rel="stylesheet">
+    <link href="./css/font-awesome.min.css" rel="stylesheet">
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link href="./css/pretty.css" rel="stylesheet">
+    <link href="./css/style.css" rel="stylesheet">
+    <script type="text/javascript" src="./js/jquery.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="./js/bootstrap-select.min.js"></script>
+    <script src="./js/slider.js"></script>
+    <script src="./js/config.js"></script>
+    <script src="./js/tooltip.js"></script>
+    <script src="./js/spectrum.js"></script>
+    <script type="text/javascript" src="./Coordinates.js"></script>
+    <script type="text/javascript" src="../../Build/Cesium/Cesium.js"></script>
+</head>
+<body>
+<div id="cesiumContainer"></div>
+<script type="text/javascript">
+
+
+    function onload(Cesium) {
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3NTVlZDNmNS01OTVmLTQ2ZGItYTc3Mi05YzJjYjE5MjViOWQiLCJpZCI6OTY3NjAsImlhdCI6MTY1Nzg3MDg2MH0.kma0QriEkAuUR-TTy4yx7DMWwg88tErPV-Z-emwwXiA'
+
+        //初始化viewer部件
+        var viewer = new Cesium.Viewer('cesiumContainer', {
+            imageryProvider: new Cesium.BingMapsImageryProvider({
+                url: 'https://dev.virtualearth.net',
+                mapStyle: Cesium.BingMapsStyle.AERIAL,
+                key: URL_CONFIG.BING_MAP_KEY
+            }),
+            // terrainProvider: Cesium.createWorldTerrain(
+            //     {
+            //         requestVertexNormals:true,
+            //         requestWaterMask : true,
+            //     }
+            // ),
+            // contextOptions: {
+            //     webgl: {
+            //         alpha: true,
+            //     }
+            // },
+        });
+        var scene = viewer.scene;
+        //拾取点击点的坐标
+        var screenSpaceEventHandler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+        screenSpaceEventHandler.setInputAction(function (evt) {
+            var cartesian = scene.pickPosition(evt.position);
+            // console.log(cartesian);
+            let cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(cartesian);
+            cartographic.longitude = Cesium.Math.toDegrees(cartographic.longitude);
+            cartographic.latitude = Cesium.Math.toDegrees(cartographic.latitude);
+            console.log(`${cartographic.longitude},${cartographic.latitude},${cartographic.height}`);
+        }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+        //设置时间
+        // Cesium.JulianDate.addHours(viewer.clock.currentTime, -12, viewer.clock.currentTime)
+
+        // var promise = scene.open("http://192.168.1.188:8990/iserver/services/3D-San_Francisco/rest/realspace");
+        var promise = scene.open("http://192.168.1.188:8990/iserver/services/3D-TOKYO/rest/realspace");
+        var cartesian0 = Cesium.Cartesian3.fromDegrees(-122.42001818114686, 37.80163763932173, -0.00032894632370555443);
+        var cartesian1 = Cesium.Cartesian3.fromDegrees(-122.41315014474807, 37.79826819316459, -0.0003861507173400953);
+        let localpos = CoordinateLocal.FromCartesian(cartesian1, cartesian0);
+        var mx = Cesium.Matrix3.fromQuaternion(
+            Cesium.Quaternion.fromAxisAngle(new Cesium.Cartesian3(localpos.x, localpos.y, localpos.z), Cesium.Math.toRadians(52.5), new Cesium.Quaternion()));
+
+
+        let mx2 = Cesium.Matrix3.fromHeadingPitchRoll(new Cesium.HeadingPitchRoll(
+            Cesium.Math.toRadians(145),
+            0,
+            0
+        ))
+        let cartesian10=Cesium.Cartesian3.fromDegrees(-122.4573785753238,37.77114495295666,162.11937177549916);
+        let cartesian11=Cesium.Cartesian3.fromDegrees(-122.45722622952752,37.75663491592138,191.05524364513738);
+        let localpos1 = CoordinateLocal.FromCartesian(cartesian11, cartesian10);
+        //**
+        // x: 13.40854835503444
+        // y: -1615.2982903172488
+        // z: 28.731322309328448
+        // let matrix3total=Cesium.Matrix3.IDENTITY;
+        // //缩放
+        // Cesium.Matrix3.multiply(
+        //     matrix3total,
+        //     Cesium.Matrix3.fromUniformScale(12.0),
+        //     matrix3total
+        // )
+        // //heading旋转
+        // Cesium.Matrix3.multiply(
+        //     matrix3total,
+        //     mx2,
+        //     matrix3total
+        // )
+        // //指定轴旋转
+        // Cesium.Matrix3.multiply(
+        //     matrix3total,
+        //     mx,
+        //     matrix3total
+        // )
+
+        // promise.then(function (layers) {
+        //     layers.forEach(layer => {
+        //
+        //
+        //         var m = layer._matModel;
+        //         //
+        //         //矩阵计算
+        //         // layer.style3D.bottomAltitude=10;
+        //
+        //         Cesium.Matrix4.multiplyByMatrix3(m,
+        //             Cesium.Matrix3.fromUniformScale(12.0),
+        //             m
+        //         )
+        //         Cesium.Matrix4.multiplyByMatrix3(m, mx2, m);
+        //         Cesium.Matrix4.multiplyByMatrix3(m, mx, m);
+        //
+        //         // Cesium.Matrix4.multiplyByTranslation(m, new Cesium.Cartesian3(0, 0, 28), m);
+        //         // Cesium.Matrix4.multiplyByTranslation(m, new Cesium.Cartesian3(localpos1.x, localpos1.y, localpos1.z), m);
+        //
+        //         // layer._matModel = m;
+        //
+        //
+        //     })
+        //
+        //     // scene.camera.setView({
+        //     //     destination: sanfcartesian,
+        //     //     // destination: new Cesium.Cartesian3(-2870619.8321989826, 4843774.545420306, 2996346.441740754),
+        //     //     orientation: {
+        //     //         heading: SuperMap3D.Math.toRadians(0.0), // east, default value is 0.0 (north)
+        //     //         pitch: SuperMap3D.Math.toRadians(-90),    // default value (looking down)
+        //     //         roll: 0.0                             // default value
+        //     //     }
+        //     //
+        //     // });
+        // })
+    }
+
+    if (typeof Cesium !== 'undefined') {
+        window.startupCalled = true;
+        onload(Cesium);
+    }
+</script>
+</body>
+</html>
